@@ -17,14 +17,14 @@ RECONNECT_FILE := "reconnect.txt"  ; MUST match Python
     SetTimer DoActions, 0
     SetTimer CheckReconnectFile, 0
 }
+^e::Reconnect
+^y::ExitApp
 
 ; ================= ACTION LOOP =================
 
 DoActions()
 {
     Send "2"
-    Send "e"
-    Send "r"
     Click "Left"
 }
 
@@ -33,6 +33,7 @@ DoActions()
 Reconnect()
 {
     Critical
+    CoordMode("Mouse", "Screen")  ; Use screen coordinates
 
     ; Stop actions during reconnect
     SetTimer DoActions, 0
@@ -46,26 +47,24 @@ Reconnect()
     Sleep 2000
 
     ; Leave
-    Click 310, 386, 2
+    Click 1894, 17
     Sleep 5000
-    Click 310, 386, 2
+    Click 1894, 17
     Sleep 3000
 
-    ; Server
-    Click 155, 416, 2
-    Sleep 5000
-    Click 155, 416, 2
-    Sleep 8000
-
     ; Join
-    Click 184, 433, 2
+    Click 315, 676
     Sleep 8000
-    Click 184, 433, 2
-    Sleep 2000
+    Click 1300, 220, 2
+    Click 1300, 220, 2
+
 
 
     ; Resume actions
     SetTimer DoActions, 100
+    CoordMode("Mouse", "Client")  ; Use screen coordinates
+    Click 400, 400   ; any guaranteed in-game area
+    Sleep 200
 }
 
 ; ================= FILE WATCHER =================

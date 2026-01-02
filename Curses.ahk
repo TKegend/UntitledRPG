@@ -3,36 +3,25 @@
 SendMode "Input"
 CoordMode "Pixel", "Client"
 CoordMode "Mouse", "Client"
-
-moveLeft := true
-moveLong := true
-directionSwitches := 0
+; ================= CONFIG =================
 RECONNECT_FILE :=  "reconnect.txt"
 ^t::
 {
-    global moveLeft, directionSwitches, moveLong
-    moveLeft := true 
-    moveLong := true
-    directionSwitches := 0
-    KeyWait "Ctrl"
     SetTimer DoActions, 100
     SetTimer CheckReconnectFile, 1000  ; check every 1 secon
-    MoveSideways()
 }
 
 ^b::
 {
-    KeyWait "Ctrl"
     SetTimer DoActions, 0
-    SetTimer MoveSideways, 0
     SetTimer CheckReconnectFile, 0  ; stop checking reconnect file
-    StopMove()
 }
 
 ^p::Reconnect()
 
 DoActions()
 {
+    Send "2"
     Click "Left"
     Send "e"
     Send "t"
@@ -43,34 +32,36 @@ DoActions()
 Reconnect()
 {
     Critical
+    CoordMode("Mouse", "Screen")  ; Use screen coordinates
+
+    ; Stop actions during reconnect
     SetTimer DoActions, 0
 
-    ; Make sure Roblox Game Client exists
+    ; Make sure Roblox exists
     if !WinExist("Roblox")
         return
 
-    ; Activate Roblox window for consistency
     WinActivate "Roblox"
     WinWaitActive "Roblox", , 2
     Sleep 2000
 
-    ; Leave
-    Click 310, 386, 2
-    Sleep 5000
-    Click 310, 386, 2
-    Sleep 2000
-
-    ; Server
-    Click 224, 345, 2
-    Sleep 5000
-    Click 224, 345, 2
-    Sleep 8000
+    ; ; Leave
+    ; Click 1894, 17
+    ; Sleep 5000
+    ; Click 1894, 17
+    ; Sleep 3000
 
     ; Join
-    Click 184, 433, 2
-    Sleep 5000
-    Click 184, 433, 2
+    Click 315, 676
+    Sleep 8000
+    Click 1300, 220, 2
     Sleep 20000
+
+    SetTimer DoActions, 100
+    CoordMode("Mouse", "Client")  ; Use screen coordinates
+    Click 400, 400   ; any guaranteed in-game area
+    Sleep 200
+
 
 
     Send "{Escape}"
@@ -83,12 +74,7 @@ Reconnect()
     Click 305, 360,2
     Sleep 5000
 
-    Send "2"
-    global moveLeft, directionSwitches
-    moveLeft := true
-    directionSwitches := 0
     SetTimer DoActions, 100
-    MoveSideways()
 }
 StopMove()
 {
@@ -135,10 +121,7 @@ CheckReconnectFile()
     {
         FileDelete RECONNECT_FILE
 
-        ; Stop movement/actions before reconnect
         SetTimer DoActions, 0
-        SetTimer MoveSideways, 0
-        StopMove()
         Reconnect()
     }
 }
