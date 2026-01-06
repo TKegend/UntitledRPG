@@ -5,7 +5,7 @@ SendMode "Input"
 ; ================= CONFIG =================
 RECONNECT_FILE := "reconnect.txt"  ; MUST match Python
 ; =========================================
-
+global Code := ""
 ^t::  ; START
 {
     SetTimer DoActions, 100
@@ -29,16 +29,40 @@ DoActions()
 }
 
 ; ================= RECONNECT =================
+; Reconnect()
+; {
+;     Critical
+;     CoordMode("Mouse", "Screen")  ; Use screen coordinates
 
+;     ; Stop actions during reconnect
+;     SetTimer DoActions, 0
+
+;     ; Make sure Roblox exists
+;     if !WinExist("Roblox")
+;         return
+
+;     WinActivate "Roblox"
+;     WinWaitActive "Roblox", , 2
+;     Sleep 2000
+
+;     Click 315, 578
+;     Sleep 8000
+;     Click 1300, 220, 2
+;     Sleep 30000
+
+;     SetTimer DoActions, 100
+;     CoordMode("Mouse", "Client")  ; Use screen coordinates
+;     Click 241, 568   ; any guaranteed in-game area
+;     Sleep 200
+
+;     SetTimer DoActions, 100
+; }
 Reconnect()
 {
     Critical
-    CoordMode("Mouse", "Screen")  ; Use screen coordinates
-
-    ; Stop actions during reconnect
+    global Code
     SetTimer DoActions, 0
 
-    ; Make sure Roblox exists
     if !WinExist("Roblox")
         return
 
@@ -46,27 +70,31 @@ Reconnect()
     WinWaitActive "Roblox", , 2
     Sleep 2000
 
-    ; Leave
-    Click 1894, 17
-    Sleep 5000
-    Click 1894, 17
-    Sleep 3000
+    ; Click the input box directly
+    Click 399, 169, 2
+    Sleep 1000
 
-    ; Join
-    Click 315, 676
-    Sleep 8000
-    Click 1300, 220, 2
-    Click 1300, 220, 2
+    ; Force focus click (IMPORTANT)
+    Click 406, 171, 2
+    Sleep 1000
 
+    ; Now type the code
+    Send Code
+    Sleep 2000
+    Send "{Enter}"
+    Sleep 1000
 
-
-    ; Resume actions
+    Click 241, 568   ; any guaranteed in-game area
+    Sleep 1000 
+    Click 200, 550
+    Sleep 2000
+    Send Code
+    Sleep 2000
+    Send "{Enter}"
+    Sleep 1000
     SetTimer DoActions, 100
-    CoordMode("Mouse", "Client")  ; Use screen coordinates
-    Click 400, 400   ; any guaranteed in-game area
-    Sleep 200
-}
 
+}
 ; ================= FILE WATCHER =================
 
 CheckReconnectFile()
@@ -75,7 +103,17 @@ CheckReconnectFile()
 
     if FileExist(RECONNECT_FILE)
     {
+        global Code
+        Code := Trim(FileRead(RECONNECT_FILE))
         FileDelete RECONNECT_FILE
         Reconnect()
     }
 }
+
+^p::
+{
+    CheckReconnectFile()
+    global Code
+    Send Code
+}
+

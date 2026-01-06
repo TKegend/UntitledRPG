@@ -52,7 +52,7 @@ Reconnect()
     ; Sleep 3000
 
     ; Join
-    Click 315, 676
+    Click 315, 651
     Sleep 8000
     Click 1300, 220, 2
     Sleep 20000
