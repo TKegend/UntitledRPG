@@ -79,9 +79,9 @@ Reconnect2()
         if idx
         {
             MouseMove Coord[idx], CoordY
-            Sleep 200
+            Sleep 500
             Click Coord[idx], CoordY+10
-            Sleep 200
+            Sleep 500
         }
     }
 

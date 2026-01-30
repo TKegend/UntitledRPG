@@ -26,7 +26,7 @@ CODE_FILE = "code.txt"
 
 # relative region of the number popup (tweak if needed)
 NUMBER_REGION1 = (0.57, 0.18, 0.65, 0.23)
-NUMBER_REGION2 = (0.18, 0.32, 0.82, 0.45)
+NUMBER_REGION2 = (0.19, 0.33, 0.81, 0.44)
 # ==========================================
 
 
@@ -70,14 +70,17 @@ def load_templates():
     return templates
 
 
-def extract_digits(img):
+def extract_digits(img, mode = "single"):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     gray = cv2.convertScaleAbs(gray, alpha=1.2, beta=10)
 
     cv2.imwrite("debug_gray.png", gray)
 
-    config = "--oem 1 --psm 7 -c tessedit_char_whitelist=0123456789"
+    if mode == "single":
+        config = "--oem 1 --psm 7 -c tessedit_char_whitelist=0123456789"
+    else:
+        config = "--oem 1 --psm 6 -c tessedit_char_whitelist=0123456789"
     text = pytesseract.image_to_string(gray, config=config)
 
     digits = "".join(filter(str.isdigit, text))
@@ -129,9 +132,8 @@ def main():
                 roi = frame[y1:y2, x1:x2]
                 cv2.imwrite("debug_roi.png", roi)
                 
-
                 # ----- Signal AHK (UNCHANGED VARIABLE) -----
-                digits = extract_digits(roi)
+                digits = extract_digits(roi, mode="single")
 
                 if digits.isdigit() and len(digits) == 4:
                     with open(SIGNAL_FILE, "w") as f:
@@ -141,6 +143,7 @@ def main():
                     print("OCR failed or incomplete:", digits)
   
                 time.sleep(10)
+                frame = capture_window(rect)
 
                 h, w, _ = frame.shape
                 x1 = int(w * NUMBER_REGION2[0])
@@ -150,7 +153,7 @@ def main():
 
                 roi = frame[y1:y2, x1:x2]
                 cv2.imwrite("debug_input.png", roi)
-                digits = extract_digits(roi)
+                digits = extract_digits(roi , mode="multiple")
                 if digits.isdigit():
                     with open(SIGNAL_FILE, "w") as f:
                         f.write(digits)
