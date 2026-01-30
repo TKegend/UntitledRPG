@@ -15,7 +15,7 @@ TEMPLATE_PATHS = [
     "popup3.png",
     "popup2.png"
 ]
-
+DETECT_FILE = "detect.txt"
 THRESHOLD = 0.75
 SIGNAL_FILE = "reconnect.txt"
 CHECK_INTERVAL = 1.0
@@ -102,13 +102,19 @@ def main():
     print("Loaded templates:", [t[0] for t in templates])
 
     while True:
+        if not os.path.exists(DETECT_FILE):
+            time.sleep(1)
+            continue
+        os.remove(DETECT_FILE)
         hwnd = find_roblox_window()
         if not hwnd:
+            print("Roblox window not found")
             time.sleep(2)
             continue
 
         rect = get_client_rect(hwnd)
         if rect[2] <= 0 or rect[3] <= 0:
+            print("Invalid window size")
             time.sleep(2)
             continue
 
@@ -162,6 +168,7 @@ def main():
                     print("OCR failed or incomplete:", digits)
                 time.sleep(2*60)
                 break
+            print("No popup detected")
 
         time.sleep(CHECK_INTERVAL)
 

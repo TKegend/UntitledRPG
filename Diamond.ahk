@@ -7,10 +7,13 @@ global Code := ""
 global Pos := ""
 global Coord := [171,226,274,321,373,422,473,523,574,624]
 global CoordY := 234
-
+global RobloxWindows := []
+global idx := 1
+global DetectInProgress := false
 ^t::  ; START
 {
-    SetTimer DoActions, 100
+    InitRobloxWindows()
+    DoActions()
     SetTimer CheckReconnectFile, 1000
 }
 
@@ -22,20 +25,63 @@ global CoordY := 234
 
 ^y::ExitApp
 
+InitRobloxWindows()
+{
+    global RobloxWindows
+
+    RobloxWindows := []
+
+    ; Get all Roblox client windows
+    for hwnd in WinGetList("ahk_exe RobloxPlayerBeta.exe")
+    {   
+        RobloxWindows.Push(hwnd)
+    }
+}
 DoActions()
 {
-    Send "r"
-    Send "e"
-    ; Send "2"
-    ; Click "Left"
+    Critical
+    global RobloxWindows, idx, DetectInProgress
+
+    if DetectInProgress
+        return
+
+    Loop 3
+    {
+        hwnd := RobloxWindows[idx]
+
+        WinActivate "ahk_id " . hwnd
+        WinWaitActive "ahk_id " . hwnd, , 1
+
+        Sleep 300
+        Send "e"
+        Sleep 300
+
+        idx++
+        if idx > RobloxWindows.Length
+            idx := 1
+    }
+
+    ; idle shift
+    idx++
+    if idx > RobloxWindows.Length
+        idx := 1
+
+
+    detectFile := A_ScriptDir "\detect.txt"
+    if FileExist(detectFile)
+        FileDelete detectFile
+    FileAppend "1", detectFile
+    SetTimer DoActions, 8000
 }
 
 Reconnect()
 {
     Critical
     global Code
+    global DetectInProgress
     SetTimer DoActions, 0
     SetTimer CheckReconnectFile, 0
+    DetectInProgress := true
 
     if !WinExist("Roblox")
         return
@@ -60,6 +106,7 @@ Reconnect2()
     global Pos
     global Coord
     global CoordY
+    global DetectInProgress
     SetTimer CheckReconnectFile2, 0
 
     digitToIndex := Map()
@@ -86,7 +133,8 @@ Reconnect2()
     }
 
     SetTimer CheckReconnectFile, 1000
-    SetTimer DoActions, 100
+    SetTimer DoActions, 8000
+    DetectInProgress := false
 }
 ; ================= FILE WATCHER =================
 
@@ -129,4 +177,15 @@ CheckReconnectFile2()
     MsgBox a[1]  ; 0
     MsgBox a[2]  ; 9
     MsgBox a[10] ; 5
+}
+
+^l::
+{
+    detectFile := "detect.txt"
+
+
+    if FileExist(detectFile)
+        FileDelete detectFile
+
+    FileAppend "1", detectFile
 }
