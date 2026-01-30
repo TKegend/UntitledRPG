@@ -12,10 +12,8 @@ import pytesseract
 WINDOW_TITLES = ["Roblox", "Roblox Player"]
 
 TEMPLATE_PATHS = [
-    # "kick.png",
-    # "kick2.png",
-    # "fail.png",
-    "popup.png"
+    "popup3.png",
+    "popup2.png"
 ]
 
 THRESHOLD = 0.75
@@ -27,8 +25,8 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 CODE_FILE = "code.txt"
 
 # relative region of the number popup (tweak if needed)
-NUMBER_REGION = (0.56, 0.22, 0.62, 0.26)
-
+NUMBER_REGION1 = (0.57, 0.18, 0.65, 0.23)
+NUMBER_REGION2 = (0.18, 0.32, 0.82, 0.45)
 # ==========================================
 
 
@@ -72,32 +70,23 @@ def load_templates():
     return templates
 
 
-# -------- OCR FUNCTION (ADDED) --------
-# def extract_digits(img):
-#     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-#     # strong threshold for white digits
-#     _, thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY)
-
-#     config = "--psm 7 -c tessedit_char_whitelist=0123456789"
-#     text = pytesseract.image_to_string(thresh, config=config)
-
-#     digits = "".join(filter(str.isdigit, text))
-#     return digits
-
 def extract_digits(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # VERY light contrast boost only
     gray = cv2.convertScaleAbs(gray, alpha=1.2, beta=10)
 
-    # Debug what Tesseract actually sees
     cv2.imwrite("debug_gray.png", gray)
 
     config = "--oem 1 --psm 7 -c tessedit_char_whitelist=0123456789"
     text = pytesseract.image_to_string(gray, config=config)
 
-    return "".join(filter(str.isdigit, text))
+    digits = "".join(filter(str.isdigit, text))
+
+    if len(digits) == 3:
+        digits = digits[0] + "8" + digits[1:]
+    return digits
+
+
 
 
 def main():
@@ -132,10 +121,10 @@ def main():
 
                 # ----- OCR number (ADDED) -----
                 h, w, _ = frame.shape
-                x1 = int(w * NUMBER_REGION[0])
-                y1 = int(h * NUMBER_REGION[1])
-                x2 = int(w * NUMBER_REGION[2])
-                y2 = int(h * NUMBER_REGION[3])
+                x1 = int(w * NUMBER_REGION1[0])
+                y1 = int(h * NUMBER_REGION1[1])
+                x2 = int(w * NUMBER_REGION1[2])
+                y2 = int(h * NUMBER_REGION1[3])
 
                 roi = frame[y1:y2, x1:x2]
                 cv2.imwrite("debug_roi.png", roi)
@@ -151,7 +140,24 @@ def main():
                 else:
                     print("OCR failed or incomplete:", digits)
   
-                time.sleep(2 * 60)
+                time.sleep(10)
+
+                h, w, _ = frame.shape
+                x1 = int(w * NUMBER_REGION2[0])
+                y1 = int(h * NUMBER_REGION2[1])
+                x2 = int(w * NUMBER_REGION2[2])
+                y2 = int(h * NUMBER_REGION2[3])
+
+                roi = frame[y1:y2, x1:x2]
+                cv2.imwrite("debug_input.png", roi)
+                digits = extract_digits(roi)
+                if digits.isdigit():
+                    with open(SIGNAL_FILE, "w") as f:
+                        f.write(digits)
+                    print("Signal file created with digits:", digits)
+                else:
+                    print("OCR failed or incomplete:", digits)
+                time.sleep(2*60)
                 break
 
         time.sleep(CHECK_INTERVAL)
