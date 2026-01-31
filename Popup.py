@@ -25,7 +25,7 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 CODE_FILE = "code.txt"
 
 # relative region of the number popup (tweak if needed)
-NUMBER_REGION1 = (0.57, 0.18, 0.65, 0.23)
+NUMBER_REGION1 = (0.58, 0.18, 0.64, 0.22)
 NUMBER_REGION2 = (0.19, 0.33, 0.81, 0.44)
 # ==========================================
 
@@ -168,7 +168,7 @@ def main():
                     print("OCR failed or incomplete:", digits)
                 time.sleep(2*60)
                 break
-            print("No popup detected")
+            
 
         time.sleep(CHECK_INTERVAL)
 

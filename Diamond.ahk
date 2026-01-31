@@ -37,6 +37,10 @@ InitRobloxWindows()
         RobloxWindows.Push(hwnd)
     }
 }
+IsWindowAlive(hwnd)
+{
+    return hwnd && WinExist("ahk_id " hwnd)
+}
 DoActions()
 {
     Critical
@@ -45,15 +49,20 @@ DoActions()
     if DetectInProgress
         return
 
-    Loop 3
+    Loop RobloxWindows.Length
     {
         hwnd := RobloxWindows[idx]
-
+        if !IsWindowAlive(hwnd) {
+            RobloxWindows.RemoveAt(idx)
+            continue
+        }
         WinActivate "ahk_id " . hwnd
         WinWaitActive "ahk_id " . hwnd, , 1
 
         Sleep 300
         Send "e"
+        Sleep 1000
+        Send "r"
         Sleep 300
 
         idx++
