@@ -5,7 +5,7 @@ SendMode "Input"
 RECONNECT_FILE := "reconnect.txt"  ; 
 global Code := ""
 global Pos := ""
-global Coord := [171,226,274,321,373,422,473,523,574,624]
+global Coord := [171,226,274,321,373,422,473,523,574,624,624]
 global CoordY := 234
 global RobloxWindows := []
 global idx := 1
@@ -27,8 +27,8 @@ global DetectInProgress := false
 
 InitRobloxWindows()
 {
-    global RobloxWindows
-
+    global RobloxWindows, idx
+    idx := 1
     RobloxWindows := []
 
     ; Get all Roblox client windows
@@ -37,6 +37,20 @@ InitRobloxWindows()
         RobloxWindows.Push(hwnd)
     }
 }
+IsWindowAlive(hwnd)
+{
+    return hwnd && WinExist("ahk_id " . hwnd)
+}
+; RButton::{
+;     InitRobloxWindows()
+;     hwnd := RobloxWindows[idx]
+;     WinActivate "ahk_id " . hwnd
+;     WinWaitActive "ahk_id " . hwnd, , 1
+;     Sleep 200
+;     Send "t"
+;     Sleep 200
+;     Send "e"
+; }
 DoActions()
 {
     Critical
@@ -44,34 +58,43 @@ DoActions()
 
     if DetectInProgress
         return
-
-    Loop 3
+    Count := 0
+    Loop RobloxWindows.Length
     {
+        Count++
         hwnd := RobloxWindows[idx]
-
+        if !IsWindowAlive(hwnd)
+        {
+            InitRobloxWindows()
+            return
+        }
         WinActivate "ahk_id " . hwnd
         WinWaitActive "ahk_id " . hwnd, , 1
 
+        Sleep 200
+        Send "2"
         Sleep 300
+        ; MouseMove 55, 538
+        ; Sleep 100
         Send "e"
-        Sleep 300
-
+        Sleep 1200
+        Send "r"
+        Sleep 200
+     
+        if Count = RobloxWindows.Length
+            Break
         idx++
         if idx > RobloxWindows.Length
             idx := 1
     }
 
-    ; idle shift
-    idx++
-    if idx > RobloxWindows.Length
-        idx := 1
 
 
     detectFile := A_ScriptDir "\detect.txt"
     if FileExist(detectFile)
         FileDelete detectFile
     FileAppend "1", detectFile
-    SetTimer DoActions, 8000
+    SetTimer DoActions, -2100
 }
 
 Reconnect()
