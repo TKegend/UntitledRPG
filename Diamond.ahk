@@ -14,7 +14,7 @@ global DetectInProgress := false
 {
     InitRobloxWindows()
     DoActions()
-    SetTimer CheckReconnectFile, 1000
+    SetTimer CheckReconnectFile, 500
 }
 
 ^b::  ; STOP
@@ -48,9 +48,10 @@ DoActions()
 
     if DetectInProgress
         return
-
+    Count := 0
     Loop RobloxWindows.Length
     {
+        Count++
         hwnd := RobloxWindows[idx]
         if !IsWindowAlive(hwnd) {
             RobloxWindows.RemoveAt(idx)
@@ -58,29 +59,27 @@ DoActions()
         }
         WinActivate "ahk_id " . hwnd
         WinWaitActive "ahk_id " . hwnd, , 1
-
-        Sleep 300
+        Sleep 200
+        Send "2"
+        Sleep 200
+        ; Click "Left"
         Send "e"
-        Sleep 1000
-        Send "r"
-        Sleep 300
-
+        Sleep 1200
+        ; Send "r"
+        Sleep 200
+    
+        if Count = RobloxWindows.Length
+            break
         idx++
         if idx > RobloxWindows.Length
             idx := 1
     }
-
-    ; idle shift
-    idx++
-    if idx > RobloxWindows.Length
-        idx := 1
-
-
     detectFile := A_ScriptDir "\detect.txt"
-    if FileExist(detectFile)
-        FileDelete detectFile
-    FileAppend "1", detectFile
-    SetTimer DoActions, 8000
+    if !FileExist(detectFile)
+    {
+        FileAppend "1", detectFile
+    }
+    SetTimer DoActions, -4000
 }
 
 Reconnect()
@@ -105,7 +104,7 @@ Reconnect()
 
     Click 383, 143
     Sleep 1000
-    SetTimer CheckReconnectFile2, 1000
+    SetTimer CheckReconnectFile2, 500
 
 }
 Reconnect2()
@@ -141,9 +140,9 @@ Reconnect2()
         }
     }
 
-    SetTimer CheckReconnectFile, 1000
-    SetTimer DoActions, 8000
+    SetTimer CheckReconnectFile, 500
     DetectInProgress := false
+    DoActions()
 }
 ; ================= FILE WATCHER =================
 

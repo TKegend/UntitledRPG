@@ -12,8 +12,7 @@ import pytesseract
 WINDOW_TITLES = ["Roblox", "Roblox Player"]
 
 TEMPLATE_PATHS = [
-    "popup3.png",
-    "popup2.png"
+    "popup3.png"
 ]
 DETECT_FILE = "detect.txt"
 THRESHOLD = 0.75
