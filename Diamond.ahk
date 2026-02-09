@@ -65,7 +65,7 @@ DoActions()
         ; Click "Left"
         Send "e"
         Sleep 1200
-        ; Send "r"
+        Send "r"
         Sleep 200
     
         if Count = RobloxWindows.Length
@@ -142,7 +142,7 @@ Reconnect2()
 
     SetTimer CheckReconnectFile, 500
     DetectInProgress := false
-    DoActions()
+    Manafarm()
 }
 ; ================= FILE WATCHER =================
 
@@ -171,29 +171,226 @@ CheckReconnectFile2()
     }
 }
 
-^p::
+Move(Key, Second)
 {
-    CheckReconnectFile()
-    global Code
-    Send Code
+    Send "{" . Key . " down}"
+    Sleep Second
+    Send "{" . Key . " up}"
+}
+^m::
+{
+    InitRobloxWindows()
+    SetTimer CheckReconnectFile, 500
+    global DetectInProgress := false
+    Manafarm()
+}
+^n::
+{
+    global DetectInProgress := true
 }
 
-^z::{
-    digits := "0987643215"
-    a := StrSplit(digits)
 
-    MsgBox a[1]  ; 0
-    MsgBox a[2]  ; 9
-    MsgBox a[10] ; 5
-}
-
-^l::
+StageOne()
 {
-    detectFile := "detect.txt"
+    Move("w", 3800)
+}
+StageTwo()
+{
+    Move("s", 1200)
+    Move("a", 6000)
+    Sleep 1000
+}
+StageThree()
+{
+    Send "{Space down}"
+    Move("a", 4500)
+    Send "{Space up}"
+}
+Manafarm()
+{
+    global RobloxWindows, idx, DetectInProgress
 
+    if DetectInProgress
+        return
+    loop 3
+    {
+        Count := 0
+        Loop RobloxWindows.Length
+        {
+            if DetectInProgress
+                return
+            Count++
+            hwnd := RobloxWindows[idx]
+            if !IsWindowAlive(hwnd) {
+                RobloxWindows.RemoveAt(idx)
+                continue
+            }
+            WinActivate "ahk_id " . hwnd
+            WinWaitActive "ahk_id " . hwnd, , 1
+            Sleep 200
+            Send "r"
+            Sleep 200
+            if Count = RobloxWindows.Length
+                break
+            idx++
+            if idx > RobloxWindows.Length
+                idx := 1
+        }
+        detectFile := A_ScriptDir "\detect.txt"
+        if !FileExist(detectFile)
+        {
+            FileAppend "1", detectFile
+        }
+        Sleep 7600
+    }
+    loop RobloxWindows.Length
+    {
+        hwnd := RobloxWindows[idx]
 
-    if FileExist(detectFile)
-        FileDelete detectFile
+        WinActivate "ahk_id " . hwnd
+        WinWaitActive "ahk_id " . hwnd, , 1
+        Sleep 200
+        StageOne()
+        Sleep 200
+        idx++
+        if idx > RobloxWindows.Length
+            idx := 1
+    }
+    loop 3
+    {
+        Count := 0
+        Loop RobloxWindows.Length
+        {
+            if DetectInProgress
+                return
+            Count++
+            hwnd := RobloxWindows[idx]
+            if !IsWindowAlive(hwnd) {
+                RobloxWindows.RemoveAt(idx)
+                continue
+            }
+            WinActivate "ahk_id " . hwnd
+            WinWaitActive "ahk_id " . hwnd, , 1
+            Sleep 200
+            Send "r"
+            Sleep 200
+            if Count = RobloxWindows.Length
+                break
+            idx++
+            if idx > RobloxWindows.Length
+                idx := 1
+        }
+        detectFile := A_ScriptDir "\detect.txt"
+        if !FileExist(detectFile)
+        {
+            FileAppend "1", detectFile
+        }
+        Sleep 7600
+    }
+    idx := 1
+    loop RobloxWindows.Length
+    {
+        hwnd := RobloxWindows[idx]
 
-    FileAppend "1", detectFile
+        WinActivate "ahk_id " . hwnd
+        WinWaitActive "ahk_id " . hwnd, , 1
+        Sleep 200
+        StageTwo()
+        Sleep 200
+        idx++
+        if idx > RobloxWindows.Length
+            idx := 1
+    }
+    loop 3
+    {
+        Count := 0
+        Loop RobloxWindows.Length
+        {
+            if DetectInProgress
+                return
+            Count++
+            hwnd := RobloxWindows[idx]
+            if !IsWindowAlive(hwnd) {
+                RobloxWindows.RemoveAt(idx)
+                continue
+            }
+            WinActivate "ahk_id " . hwnd
+            WinWaitActive "ahk_id " . hwnd, , 1
+            Sleep 200
+            Send "r"
+            Sleep 200
+            if Count = RobloxWindows.Length
+                break
+            idx++
+            if idx > RobloxWindows.Length
+                idx := 1
+        }
+        detectFile := A_ScriptDir "\detect.txt"
+        if !FileExist(detectFile)
+        {
+            FileAppend "1", detectFile
+        }
+        Sleep 7600
+    }
+    idx := 1
+    loop RobloxWindows.Length
+    {
+        hwnd := RobloxWindows[idx]
+
+        WinActivate "ahk_id " . hwnd
+        WinWaitActive "ahk_id " . hwnd, , 1
+        Sleep 200
+        StageThree()
+        Sleep 200
+        idx++
+        if idx > RobloxWindows.Length
+            idx := 1
+    }
+    loop 3
+    {
+        Count := 0
+        Loop RobloxWindows.Length
+        {
+            if DetectInProgress
+                return
+            Count++
+            hwnd := RobloxWindows[idx]
+            if !IsWindowAlive(hwnd) {
+                RobloxWindows.RemoveAt(idx)
+                continue
+            }
+            WinActivate "ahk_id " . hwnd
+            WinWaitActive "ahk_id " . hwnd, , 1
+            Sleep 200
+            Send "r"
+            Sleep 200
+            if Count = RobloxWindows.Length
+                break
+            idx++
+            if idx > RobloxWindows.Length
+                idx := 1
+        }
+        detectFile := A_ScriptDir "\detect.txt"
+        if !FileExist(detectFile)
+        {
+            FileAppend "1", detectFile
+        }
+        Sleep 7600
+    }
+    idx := 1
+    loop RobloxWindows.Length
+    {
+        hwnd := RobloxWindows[idx]
+
+        WinActivate "ahk_id " . hwnd
+        WinWaitActive "ahk_id " . hwnd, , 1
+        Sleep 200
+        Send "2"
+        Sleep 200
+        idx++
+        if idx > RobloxWindows.Length
+            idx := 1
+    }
+    Manafarm()
+
 }
