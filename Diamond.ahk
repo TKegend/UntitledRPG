@@ -89,6 +89,7 @@ Reconnect()
     global DetectInProgress
     SetTimer DoActions, 0
     SetTimer CheckReconnectFile, 0
+    SetTimer Manafarm, 0
     DetectInProgress := true
 
     if !WinExist("Roblox")
@@ -139,10 +140,9 @@ Reconnect2()
             Sleep 500
         }
     }
-
     SetTimer CheckReconnectFile, 500
     DetectInProgress := false
-    Manafarm()
+    SetTimer Manafarm, 1000
 }
 ; ================= FILE WATCHER =================
 
@@ -177,26 +177,38 @@ Move(Key, Second)
     Sleep Second
     Send "{" . Key . " up}"
 }
+
 ^m::
 {
+    global DetectInProgress
+    DetectInProgress := false
     InitRobloxWindows()
     SetTimer CheckReconnectFile, 500
-    global DetectInProgress := false
-    Manafarm()
-}
-^n::
-{
-    global DetectInProgress := true
+    SetTimer Manafarm, 1000   ; repeat every 500 ms
 }
 
+^n::
+{
+    global DetectInProgress
+    DetectInProgress := true
+    SetTimer Manafarm, 0
+    SetTimer DoActions, 0
+    SetTimer CheckReconnectFile, 0
+    SetTimer CheckReconnectFile2, 0
+}
+
+^i::
+{
+    StageOne()
+}
 
 StageOne()
 {
-    Move("w", 3800)
+    Move("w", 3700)
 }
 StageTwo()
 {
-    Move("s", 1200)
+    Move("s", 1100)
     Move("a", 6000)
     Sleep 1000
 }
@@ -391,6 +403,5 @@ Manafarm()
         if idx > RobloxWindows.Length
             idx := 1
     }
-    Manafarm()
-
+  
 }
