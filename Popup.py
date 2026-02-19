@@ -12,7 +12,8 @@ import pytesseract
 WINDOW_TITLES = ["Roblox", "Roblox Player"]
 
 TEMPLATE_PATHS = [
-    "popup3.png"
+    "popup3.png",
+    "popup4.png"
 ]
 DETECT_FILE = "detect.txt"
 THRESHOLD = 0.75
@@ -24,6 +25,7 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 CODE_FILE = "code.txt"
 
 # relative region of the number popup (tweak if needed)
+# NUMBER_REGION1 = (0.58, 0.18, 0.64, 0.2125)
 NUMBER_REGION1 = (0.58, 0.18, 0.64, 0.22)
 NUMBER_REGION2 = (0.19, 0.33, 0.81, 0.44)
 # ==========================================
@@ -72,7 +74,7 @@ def load_templates():
 def extract_digits(img, mode = "single"):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    gray = cv2.convertScaleAbs(gray, alpha=1.2, beta=10)
+    # gray = cv2.convertScaleAbs(gray, alpha=1.2, beta=10)
 
     cv2.imwrite("debug_gray.png", gray)
 
@@ -104,7 +106,13 @@ def main():
         if not os.path.exists(DETECT_FILE):
             time.sleep(1)
             continue
-        os.remove(DETECT_FILE)
+
+        try:
+            os.remove(DETECT_FILE)
+        except PermissionError:
+            # AHK still writing — just retry next loop
+            time.sleep(0.2)
+            continue
         hwnd = find_roblox_window()
         if not hwnd:
             print("Roblox window not found")
@@ -159,13 +167,14 @@ def main():
                 roi = frame[y1:y2, x1:x2]
                 cv2.imwrite("debug_input.png", roi)
                 digits = extract_digits(roi , mode="multiple")
+                digits = "2346789015"
                 if digits.isdigit():
                     with open(SIGNAL_FILE, "w") as f:
                         f.write(digits)
                     print("Signal file created with digits:", digits)
                 else:
                     print("OCR failed or incomplete:", digits)
-                time.sleep(2*60)
+                time.sleep(5)
                 break
             
 
