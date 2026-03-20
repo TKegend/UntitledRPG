@@ -36,3 +36,13 @@ Please wait : 잠시만 기다려주세요
 가능
 거래 보냈어요
 참가해 주세요
+
+
+while ($true) {
+    Get-Process RobloxPlayerBeta -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.PriorityClass -ne "Idle") {
+            $_.PriorityClass = "Idle"
+        }
+    }
+    Start-Sleep -Milliseconds 500
+}
