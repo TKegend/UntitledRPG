@@ -14,7 +14,6 @@ global DetectInProgress := false
 {
     InitRobloxWindows()
     DoActions()
-    SetTimer CheckReconnectFile, 500
 }
 
 ^b::  ; STOP
@@ -62,24 +61,21 @@ DoActions()
         Sleep 200
         Send "2"
         Sleep 200
-        ; Click "Left"
-        Send "e"
-        Sleep 1200
         Send "r"
         Sleep 200
     
-        if Count = RobloxWindows.Length
-            break
+        ; if Count = RobloxWindows.Length
+        ;     break
         idx++
         if idx > RobloxWindows.Length
             idx := 1
     }
-    detectFile := A_ScriptDir "\detect.txt"
-    if !FileExist(detectFile)
-    {
-        FileAppend "1", detectFile
-    }
-    SetTimer DoActions, -4000
+    ; detectFile := A_ScriptDir "\detect.txt"
+    ; if !FileExist(detectFile)
+    ; {
+    ;     FileAppend "1", detectFile
+    ; }
+    SetTimer DoActions, -36000
 }
 
 Reconnect()
@@ -142,6 +138,7 @@ Reconnect2()
     }
     SetTimer CheckReconnectFile, 500
     DetectInProgress := false
+    ; SetTimer DoActions, 1000
     SetTimer Manafarm, 1000
 }
 ; ================= FILE WATCHER =================
@@ -240,7 +237,7 @@ Manafarm()
         if idx > RobloxWindows.Length
             idx := 1
     }
-    loop 5
+    loop 3
     {
         Count := 0
         Loop RobloxWindows.Length
@@ -288,7 +285,7 @@ Manafarm()
         if idx > RobloxWindows.Length
             idx := 1
     }
-    loop 5
+    loop 3
     {
         Count := 0
         Loop RobloxWindows.Length
@@ -337,7 +334,7 @@ Manafarm()
         if idx > RobloxWindows.Length
             idx := 1
     }
-    loop 2
+    loop 1
     {
         Count := 0
         Loop RobloxWindows.Length
@@ -386,7 +383,7 @@ Manafarm()
         if idx > RobloxWindows.Length
             idx := 1
     }
-    loop 5
+    loop 3
     {
         Count := 0
         Loop RobloxWindows.Length
@@ -423,13 +420,12 @@ Manafarm()
 
 ^r::
 {
-    SetTimer DoThis, 100
+  DoThis()
 }
 ^e::{
     SetTimer DoThis, 0
 }
 DoThis()
 {
-    Send "r"
-    Send "t"
+    StageOne()
 }

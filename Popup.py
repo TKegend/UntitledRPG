@@ -104,7 +104,7 @@ def main():
 
     while True:
         if not os.path.exists(DETECT_FILE):
-            time.sleep(1)
+            time.sleep(0.5)
             continue
 
         try:
@@ -156,24 +156,24 @@ def main():
                     print("OCR failed or incomplete:", digits)
   
                 time.sleep(10)
-                frame = capture_window(rect)
+                # frame = capture_window(rect)
 
-                h, w, _ = frame.shape
-                x1 = int(w * NUMBER_REGION2[0])
-                y1 = int(h * NUMBER_REGION2[1])
-                x2 = int(w * NUMBER_REGION2[2])
-                y2 = int(h * NUMBER_REGION2[3])
+                # h, w, _ = frame.shape
+                # x1 = int(w * NUMBER_REGION2[0])
+                # y1 = int(h * NUMBER_REGION2[1])
+                # x2 = int(w * NUMBER_REGION2[2])
+                # y2 = int(h * NUMBER_REGION2[3])
 
-                roi = frame[y1:y2, x1:x2]
-                cv2.imwrite("debug_input.png", roi)
-                digits = extract_digits(roi , mode="multiple")
-                digits = "2346789015"
-                if digits.isdigit():
-                    with open(SIGNAL_FILE, "w") as f:
-                        f.write(digits)
-                    print("Signal file created with digits:", digits)
-                else:
-                    print("OCR failed or incomplete:", digits)
+                # roi = frame[y1:y2, x1:x2]
+                # cv2.imwrite("debug_input.png", roi)
+                # digits = extract_digits(roi , mode="multiple")
+                # digits = "2346789015"
+                # if digits.isdigit():
+                #     with open(SIGNAL_FILE, "w") as f:
+                #         f.write(digits)
+                #     print("Signal file created with digits:", digits)
+                # else:
+                #     print("OCR failed or incomplete:", digits)
                 time.sleep(5)
                 break
             
