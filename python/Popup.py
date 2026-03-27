@@ -7,22 +7,28 @@ import win32gui
 import win32con
 import pytesseract
 
+# ================= PATHS =================
+
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_ROOT = os.path.dirname(_SCRIPT_DIR)          # project root
+_IMAGES = os.path.join(_ROOT, "images")
+
 # ================= CONFIG =================
 
 WINDOW_TITLES = ["Roblox", "Roblox Player"]
 
 TEMPLATE_PATHS = [
-    "popup3.png",
-    "popup4.png"
+    # os.path.join(_IMAGES, "popup3.png"),
+    os.path.join(_IMAGES, "popup4.png"),
 ]
-DETECT_FILE = "detect.txt"
+DETECT_FILE = os.path.join(_ROOT, "detect.txt")
 THRESHOLD = 0.75
-SIGNAL_FILE = "reconnect.txt"
+SIGNAL_FILE = os.path.join(_ROOT, "reconnect.txt")
 CHECK_INTERVAL = 1.0
 
 # ---- Tesseract OCR (ADDED) ----
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-CODE_FILE = "code.txt"
+CODE_FILE = os.path.join(_ROOT, "code.txt")
 
 # relative region of the number popup (tweak if needed)
 # NUMBER_REGION1 = (0.58, 0.18, 0.64, 0.2125)
@@ -76,7 +82,7 @@ def extract_digits(img, mode = "single"):
 
     # gray = cv2.convertScaleAbs(gray, alpha=1.2, beta=10)
 
-    cv2.imwrite("debug_gray.png", gray)
+    cv2.imwrite(os.path.join(_IMAGES, "debug_gray.png"), gray)
 
     if mode == "single":
         config = "--oem 1 --psm 7 -c tessedit_char_whitelist=0123456789"
@@ -143,7 +149,7 @@ def main():
                 y2 = int(h * NUMBER_REGION1[3])
 
                 roi = frame[y1:y2, x1:x2]
-                cv2.imwrite("debug_roi.png", roi)
+                cv2.imwrite(os.path.join(_IMAGES, "debug_roi.png"), roi)
                 
                 # ----- Signal AHK (UNCHANGED VARIABLE) -----
                 digits = extract_digits(roi, mode="single")
@@ -165,7 +171,7 @@ def main():
                 # y2 = int(h * NUMBER_REGION2[3])
 
                 # roi = frame[y1:y2, x1:x2]
-                # cv2.imwrite("debug_input.png", roi)
+                # cv2.imwrite(os.path.join(_IMAGES, "debug_input.png"), roi)
                 # digits = extract_digits(roi , mode="multiple")
                 # digits = "2346789015"
                 # if digits.isdigit():

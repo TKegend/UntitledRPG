@@ -1,8 +1,8 @@
-﻿#Requires AutoHotkey v2.0
+#Requires AutoHotkey v2.0
 #UseHook
 SendMode "Input"
 
-RECONNECT_FILE := "reconnect.txt"  ; 
+RECONNECT_FILE := A_ScriptDir "\..\.\reconnect.txt"  ; 
 global Code := ""
 global Pos := ""
 global Coord := [171,226,274,321,373,422,473,523,574,624,624]
@@ -10,19 +10,6 @@ global CoordY := 234
 global RobloxWindows := []
 global idx := 1
 global DetectInProgress := false
-^t::  ; START
-{
-    InitRobloxWindows()
-    DoActions()
-}
-
-^b::  ; STOP
-{
-    SetTimer DoActions, 0
-    SetTimer CheckReconnectFile, 0
-}
-
-^y::ExitApp
 
 InitRobloxWindows()
 {
@@ -40,50 +27,12 @@ IsWindowAlive(hwnd)
 {
     return hwnd && WinExist("ahk_id " hwnd)
 }
-DoActions()
-{
-    Critical
-    global RobloxWindows, idx, DetectInProgress
-
-    if DetectInProgress
-        return
-    Count := 0
-    Loop RobloxWindows.Length
-    {
-        Count++
-        hwnd := RobloxWindows[idx]
-        if !IsWindowAlive(hwnd) {
-            RobloxWindows.RemoveAt(idx)
-            continue
-        }
-        WinActivate "ahk_id " . hwnd
-        WinWaitActive "ahk_id " . hwnd, , 1
-        Sleep 200
-        Send "2"
-        Sleep 200
-        Send "r"
-        Sleep 200
-    
-        ; if Count = RobloxWindows.Length
-        ;     break
-        idx++
-        if idx > RobloxWindows.Length
-            idx := 1
-    }
-    ; detectFile := A_ScriptDir "\detect.txt"
-    ; if !FileExist(detectFile)
-    ; {
-    ;     FileAppend "1", detectFile
-    ; }
-    SetTimer DoActions, -36000
-}
 
 Reconnect()
 {
     Critical
     global Code
     global DetectInProgress
-    SetTimer DoActions, 0
     SetTimer CheckReconnectFile, 0
     SetTimer Manafarm, 0
     DetectInProgress := true
@@ -138,7 +87,6 @@ Reconnect2()
     }
     SetTimer CheckReconnectFile, 500
     DetectInProgress := false
-    ; SetTimer DoActions, 1000
     SetTimer Manafarm, 1000
 }
 ; ================= FILE WATCHER =================
@@ -189,30 +137,24 @@ Move(Key, Second)
     global DetectInProgress
     DetectInProgress := true
     SetTimer Manafarm, 0
-    SetTimer DoActions, 0
     SetTimer CheckReconnectFile, 0
     SetTimer CheckReconnectFile2, 0
 }
 
-^i::
-{
-    StageOne()
-}
-
 StageOne()
 {
-    Move("w", 3700)
+    Move("w", 3600)
 }
 StageTwo()
 {
-    Move("s", 1100)
+    Move("s", 900)
     Move("a", 6000)
     Sleep 1000
 }
 StageThree()
 {
     Send "{Space down}"
-    Move("a", 4500)
+    Move("a", 4800)
     Send "{Space up}"
 }
 Manafarm()
@@ -263,7 +205,7 @@ Manafarm()
             if idx > RobloxWindows.Length
                 idx := 1
         }
-        detectFile := A_ScriptDir "\detect.txt"
+        detectFile := A_ScriptDir "\\..\detect.txt"
         if !FileExist(detectFile)
         {
             FileAppend "1", detectFile
@@ -311,7 +253,7 @@ Manafarm()
             if idx > RobloxWindows.Length
                 idx := 1
         }
-        detectFile := A_ScriptDir "\detect.txt"
+        detectFile := A_ScriptDir "\\..\detect.txt"
         if !FileExist(detectFile)
         {
             FileAppend "1", detectFile
@@ -351,8 +293,6 @@ Manafarm()
             WinWaitActive "ahk_id " . hwnd, , 1
             Sleep 200
             Send "r"
-            ; Sleep 800
-            ; Send "t"
             Sleep 200
             if Count = RobloxWindows.Length
                 break
@@ -360,7 +300,7 @@ Manafarm()
             if idx > RobloxWindows.Length
                 idx := 1
         }
-        detectFile := A_ScriptDir "\detect.txt"
+        detectFile := A_ScriptDir "\\..\detect.txt"
         if !FileExist(detectFile)
         {
             FileAppend "1", detectFile
@@ -409,7 +349,7 @@ Manafarm()
             if idx > RobloxWindows.Length
                 idx := 1
         }
-        detectFile := A_ScriptDir "\detect.txt"
+        detectFile := A_ScriptDir "\\..\detect.txt"
         if !FileExist(detectFile)
         {
             FileAppend "1", detectFile
@@ -423,7 +363,11 @@ Manafarm()
   DoThis()
 }
 ^e::{
-    SetTimer DoThis, 0
+    StageTwo()
+}
+^y::
+{
+    StageThree()
 }
 DoThis()
 {
