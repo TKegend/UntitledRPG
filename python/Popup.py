@@ -14,16 +14,19 @@ _ROOT = os.path.dirname(_SCRIPT_DIR)          # project root
 _IMAGES = os.path.join(_ROOT, "images")
 
 # ================= CONFIG =================
-
+FIFTH_ROW_CHECK = (0.73, 0.47)  # (x %, y %) tweak this
+DARK_THRESHOLD = 80         # lower = darker
 WINDOW_TITLES = ["Roblox", "Roblox Player"]
 
 TEMPLATE_PATHS = [
-    # os.path.join(_IMAGES, "popup3.png"),
+    # os.path.join(_IMAGES, "public.png"),
+    os.path.join(_IMAGES, "popup3.png"),
     os.path.join(_IMAGES, "popup4.png"),
 ]
 DETECT_FILE = os.path.join(_ROOT, "detect.txt")
-THRESHOLD = 0.75
+THRESHOLD = 0.50
 SIGNAL_FILE = os.path.join(_ROOT, "reconnect.txt")
+DELETE_FILE = os.path.join(_ROOT, "reconnect.txt")
 CHECK_INTERVAL = 1.0
 
 # ---- Tesseract OCR (ADDED) ----
@@ -96,6 +99,30 @@ def extract_digits(img, mode = "single"):
         digits = digits[0] + "8" + digits[1:]
     return digits
 
+def is_fifth_player_present(frame):
+    h, w, _ = frame.shape
+
+    x = int(w * FIFTH_ROW_CHECK[0])
+    y = int(h * FIFTH_ROW_CHECK[1])
+
+    pixel = frame[y, x]
+    gray = int(0.299*pixel[2] + 0.587*pixel[1] + 0.114*pixel[0])
+
+    print(f"Pixel check at ({x},{y}) → gray={gray}")
+
+    # ===== DRAW DEBUG POINT =====
+    debug = frame.copy()
+
+    # red dot (the pixel)
+    cv2.circle(debug, (x, y), 6, (0, 0, 255), -1)
+
+    # optional: draw small box around it
+    cv2.rectangle(debug, (x-10, y-10), (x+10, y+10), (0, 255, 0), 2)
+
+    # save image so you can inspect
+    cv2.imwrite(os.path.join(_IMAGES, "debug_pixel.png"), debug)
+
+    return gray < DARK_THRESHOLD
 
 
 
@@ -133,6 +160,18 @@ def main():
 
         frame = capture_window(rect)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frame = capture_window(rect)
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # ===== ALWAYS CHECK LEADERBOARD FIRST =====
+        if is_fifth_player_present(frame):
+            print("5th player detected → sending DELETE")
+
+            with open(DELETE_FILE, "w") as f:
+                f.write("delete")
+
+            time.sleep(2)
+            continue   # skip everything else this loop
 
         for name, template in templates:
             res = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF_NORMED)
@@ -161,7 +200,7 @@ def main():
                 else:
                     print("OCR failed or incomplete:", digits)
   
-                time.sleep(10)
+                time.sleep(1)
                 # frame = capture_window(rect)
 
                 # h, w, _ = frame.shape
