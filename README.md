@@ -80,3 +80,68 @@ UntitledRPG/
    ```
 3. Run the desired AHK script (double-click or right-click → Run as AHK v2)
 4. Use the hotkeys inside the script to start/stop the macro
+
+---
+
+## New User Setup Guide (No Git, No CLI, No pip)
+
+If you've never used Git, a terminal, or Python before, follow these steps from scratch.
+
+### Step 1 — Download the project
+
+1. Go to the GitHub repository page in your browser
+2. Click the green **Code** button
+3. Click **Download ZIP**
+4. Extract the ZIP anywhere on your PC (e.g. `C:\Users\You\Desktop\UntitledRPG`)
+
+### Step 2 — Install AutoHotkey v2
+
+1. Go to https://www.autohotkey.com/download/
+2. Download and run the **AutoHotkey v2.x** installer
+3. Follow the installer — default options are fine
+
+### Step 3 — Install Python
+
+1. Go to https://www.python.org/downloads/
+2. Download the latest **Python 3.x** installer for Windows
+3. Run the installer — **check the box "Add Python to PATH"** before clicking Install
+4. Complete the install
+
+### Step 4 — Set up a Python virtual environment and install libraries
+
+A virtual environment keeps the project's packages separate from the rest of your PC.
+
+1. Press `Win + R`, type `cmd`, press Enter — this opens Command Prompt
+2. Navigate to the project folder (replace the path with wherever you extracted it):
+   ```
+   cd C:\Users\You\Desktop\UntitledRPG
+   ```
+3. Create the virtual environment:
+   ```
+   python -m venv .venv
+   ```
+4. Activate it:
+   ```
+   .venv\Scripts\activate
+   ```
+   You should see `(.venv)` appear at the start of the line — this means it's active.
+5. Install the required libraries:
+   ```
+   pip install opencv-python numpy mss pywin32 pytesseract
+   ```
+6. Wait for it to finish
+
+> **Note:** Every time you open a new Command Prompt to run `Popup.py`, you need to repeat steps 2 and 4 to activate the environment first before running the script.
+
+### Step 5 — Install Tesseract OCR
+
+1. Go to https://github.com/UB-Mannheim/tesseract/wiki
+2. Download and run the Windows installer
+3. Install to the default path: `C:\Program Files\Tesseract-OCR\`
+4. During install, check **"Add to PATH"** if prompted
+
+### Step 6 — Run the scripts
+
+1. Navigate to the extracted project folder
+2. Double-click `python/Popup.py` — if Python is installed correctly it will open, otherwise right-click → **Open with → Python**
+3. Double-click any `.ahk` file to run it with AutoHotkey v2
