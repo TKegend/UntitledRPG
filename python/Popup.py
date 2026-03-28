@@ -14,7 +14,7 @@ _ROOT = os.path.dirname(_SCRIPT_DIR)          # project root
 _IMAGES = os.path.join(_ROOT, "images")
 
 # ================= CONFIG =================
-FIFTH_ROW_CHECK = (0.73, 0.47)  # (x %, y %) tweak this
+FIFTH_ROW_CHECK = (0.73, 0.40)  # (x %, y %) tweak this
 DARK_THRESHOLD = 60         # lower = darker
 WINDOW_TITLES = ["Roblox", "Roblox Player"]
 
@@ -166,6 +166,20 @@ def main():
         # ===== ALWAYS CHECK LEADERBOARD FIRST =====
         if is_fifth_player_present(frame):
             print("5th player detected → sending DELETE")
+            h, w, _ = frame.shape
+
+            x = int(w * FIFTH_ROW_CHECK[0])
+            y = int(h * FIFTH_ROW_CHECK[1])
+            debug = frame.copy()
+
+            # red dot (the pixel)
+            cv2.circle(debug, (x, y), 6, (0, 0, 255), -1)
+
+            # optional: draw small box around it
+            cv2.rectangle(debug, (x-10, y-10), (x+10, y+10), (0, 255, 0), 2)
+
+            # save image so you can inspect
+            cv2.imwrite(os.path.join(_IMAGES, "debug_pixel_delete.png"), debug)
 
             with open(DELETE_FILE, "w") as f:
                 f.write("delete")
