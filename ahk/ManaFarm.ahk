@@ -71,6 +71,17 @@ Reconnect()
 }
 ; ================= FILE WATCHER =================
 
+LogoutAndClose()
+{
+    SetTimer CheckReconnectFile, 0
+    SetTimer Manafarm, 0
+
+    for hwnd in WinGetList("ahk_exe RobloxPlayerBeta.exe")
+    {
+        WinClose "ahk_id " hwnd
+    }
+}
+
 CheckReconnectFile()
 {
     global RECONNECT_FILE
@@ -80,6 +91,13 @@ CheckReconnectFile()
         global Code
         Code := Trim(FileRead(RECONNECT_FILE))
         FileDelete RECONNECT_FILE
+
+        if (Code = "delete")
+        {
+            LogoutAndClose()
+            return
+        }
+
         Reconnect()
     }
 }
@@ -355,6 +373,12 @@ DoThis()
 }
 ^s::
 {
-    global DetectInProgress
-    DetectInProgress := !DetectInProgress
+    InitRobloxWindows()
+
+}
+TestCheck()
+{
+    detectFile := A_ScriptDir "\\..\detect.txt"
+        if !FileExist(detectFile)
+            FileAppend "1", detectFile
 }
