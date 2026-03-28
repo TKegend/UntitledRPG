@@ -15,7 +15,7 @@ _IMAGES = os.path.join(_ROOT, "images")
 
 # ================= CONFIG =================
 FIFTH_ROW_CHECK = (0.73, 0.47)  # (x %, y %) tweak this
-DARK_THRESHOLD = 80         # lower = darker
+DARK_THRESHOLD = 60         # lower = darker
 WINDOW_TITLES = ["Roblox", "Roblox Player"]
 
 TEMPLATE_PATHS = [
@@ -172,7 +172,7 @@ def main():
 
             time.sleep(2)
             continue   # skip everything else this loop
-
+        time.sleep(4)  # small delay before template checks
         for name, template in templates:
             res = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF_NORMED)
             _, max_val, _, _ = cv2.minMaxLoc(res)
