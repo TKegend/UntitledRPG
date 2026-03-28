@@ -200,12 +200,12 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
-            Send "{Tab}"
-            Sleep 500
-            TestCheck()
-            Sleep 2000
-            Send "{Tab}"
-            Sleep 1500
+            ; Send "{Tab}"
+            ; Sleep 500
+            ; TestCheck()
+            ; Sleep 2000
+            ; Send "{Tab}"
+            ; Sleep 1500
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
@@ -257,12 +257,12 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
-            Send "{Tab}"
-            Sleep 500
-            TestCheck()
-            Sleep 2000
-            Send "{Tab}"
-            Sleep 1500
+            ; Send "{Tab}"
+            ; Sleep 500
+            ; TestCheck()
+            ; Sleep 2000
+            ; Send "{Tab}"
+            ; Sleep 1500
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
@@ -314,12 +314,12 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
-            Send "{Tab}"
-            Sleep 500
-            TestCheck()
-            Sleep 2000
-            Send "{Tab}"
-            Sleep 1500
+            ; Send "{Tab}"
+            ; Sleep 500
+            ; TestCheck()
+            ; Sleep 2000
+            ; Send "{Tab}"
+            ; Sleep 1500
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
