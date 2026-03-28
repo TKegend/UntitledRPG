@@ -78,8 +78,14 @@ LogoutAndClose()
 
     for hwnd in WinGetList("ahk_exe RobloxPlayerBeta.exe")
     {
-        WinClose "ahk_id " hwnd
+        ; WinClose "ahk_id " hwnd
+        ; Sleep 1000
+        ; MouseMove 250, 550
+        Sleep 500
+        ; Click 300 , 550
     }
+    SetTimer CheckReconnectFile, 500
+    SetTimer Manafarm, 1000 
 }
 
 CheckReconnectFile()
@@ -202,7 +208,7 @@ Manafarm()
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 3200
+            Sleep 3500
         }
         idx := 1
         loop RobloxWindows.Length
@@ -258,7 +264,7 @@ Manafarm()
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 3200
+            Sleep 3500
         }
         idx := 1
         loop RobloxWindows.Length
@@ -314,7 +320,7 @@ Manafarm()
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 3200
+            Sleep 3500
         }
         idx := 1
         loop RobloxWindows.Length
@@ -370,7 +376,7 @@ Manafarm()
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 3200
+            Sleep 3500
         }
         ManaStage := 0
     }
@@ -391,10 +397,15 @@ DoThis()
 {
     StageOne()
 }
-^s::
+^x::
 {
     InitRobloxWindows()
     TestCheck()
+}
+^b::
+{
+    InitRobloxWindows()
+    LogoutAndClose()
 }
 TestCheck()
 {
