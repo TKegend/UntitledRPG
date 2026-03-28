@@ -194,10 +194,15 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
+            Send "{Tab}"
+            Sleep 1000
+            TestCheck()
+            Sleep 3000
+            Send "{Tab}"
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 7600
+            Sleep 3200
         }
         idx := 1
         loop RobloxWindows.Length
@@ -245,10 +250,15 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
+            Send "{Tab}"
+            Sleep 1000
+            TestCheck()
+            Sleep 3000
+            Send "{Tab}"
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 7600
+            Sleep 3200
         }
         idx := 1
         loop RobloxWindows.Length
@@ -296,10 +306,15 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
+            Send "{Tab}"
+            Sleep 1000
+            TestCheck()
+            Sleep 3000
+            Send "{Tab}"
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 7600
+            Sleep 3200
         }
         idx := 1
         loop RobloxWindows.Length
@@ -347,10 +362,15 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
+            Send "{Tab}"
+            Sleep 1000
+            TestCheck()
+            Sleep 3000
+            Send "{Tab}"
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 7600
+            Sleep 3200
         }
         ManaStage := 0
     }
@@ -374,7 +394,7 @@ DoThis()
 ^s::
 {
     InitRobloxWindows()
-
+    TestCheck()
 }
 TestCheck()
 {
