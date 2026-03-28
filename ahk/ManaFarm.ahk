@@ -353,3 +353,8 @@ DoThis()
 {
     StageOne()
 }
+^s::
+{
+    global DetectInProgress
+    DetectInProgress := !DetectInProgress
+}
