@@ -138,7 +138,7 @@ A virtual environment keeps the project's packages separate from the rest of you
 1. Go to https://github.com/UB-Mannheim/tesseract/wiki
 2. Download and run the Windows installer
 3. Install to the default path: `C:\Program Files\Tesseract-OCR\`
-4. During install, check **"Add to PATH"** if prompted
+4. During install, check **"Add to PATH"** if prompted. If not go into the file, right click the bin and copy path then put into enviroments.
 
 ### Step 6 — Run the scripts
 
