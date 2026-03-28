@@ -33,44 +33,24 @@ Reconnect()
 {
     Critical
     global Code
-    global DetectInProgress
+    global Coord
+    global CoordY
     SetTimer CheckReconnectFile, 0
     SetTimer Manafarm, 0
-    DetectInProgress := true
 
-    if !WinExist("Roblox")
-        return
-
-    WinActivate "Roblox"
-    WinWaitActive "Roblox", , 2
-    Sleep 2000
-
-    ; Click the input box directly
     MouseMove 363, 142
     Sleep 1000
 
     Click 383, 143
     Sleep 1000
-    SetTimer CheckReconnectFile2, 500
-
-}
-Reconnect2()
-{
-    Critical
-    global Code
-    global Pos
-    global Coord
-    global CoordY
-    global DetectInProgress
-    SetTimer CheckReconnectFile2, 0
 
     digitToIndex := Map()
+    Pos := "2346789015"
 
     Position := StrSplit(Pos)
+
     for i, d in Position
-    {
         digitToIndex[d] := i
-    }
 
     Codes := StrSplit(Code)
 
@@ -87,8 +67,7 @@ Reconnect2()
         }
     }
     SetTimer CheckReconnectFile, 500
-    DetectInProgress := false
-    SetTimer Manafarm, 1000
+    SetTimer Manafarm, 1000   ; repeat every 500 ms
 }
 ; ================= FILE WATCHER =================
 
@@ -104,18 +83,7 @@ CheckReconnectFile()
         Reconnect()
     }
 }
-CheckReconnectFile2()
-{
-    global RECONNECT_FILE
 
-    if FileExist(RECONNECT_FILE)
-    {
-        global Pos
-        Pos := Trim(FileRead(RECONNECT_FILE))
-        FileDelete RECONNECT_FILE
-        Reconnect2()
-    }
-}
 
 Move(Key, Second)
 {
@@ -141,7 +109,6 @@ Move(Key, Second)
     DetectInProgress := true
     SetTimer Manafarm, 0
     SetTimer CheckReconnectFile, 0
-    SetTimer CheckReconnectFile2, 0
 }
 
 StageOne()
