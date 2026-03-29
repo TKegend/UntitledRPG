@@ -266,7 +266,7 @@ Manafarm()
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 3500
+            Sleep 7500
         }
         idx := 1
         loop RobloxWindows.Length
@@ -323,7 +323,7 @@ Manafarm()
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 3500
+            Sleep 7500
         }
         idx := 1
         loop RobloxWindows.Length
