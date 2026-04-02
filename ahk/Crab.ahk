@@ -280,6 +280,8 @@ LoopWindows()
         Sleep 3000
 
         CheckReconnectFile()
+        TimeElapse += 200
+        Sleep 200
 
         if Code
         {
@@ -301,6 +303,7 @@ CheckReconnectFile()
     {
         global Code
         Code := Trim(FileRead(RECONNECT_FILE))
+        Sleep 200
         FileDelete RECONNECT_FILE
     }
 }

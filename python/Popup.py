@@ -6,6 +6,8 @@ import mss
 import win32gui
 import win32con
 import pytesseract
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 # ================= PATHS =================
 
@@ -126,6 +128,74 @@ def is_fifth_player_present(frame):
 
 
 
+def handle_detect(templates):
+    hwnd = find_roblox_window()
+    if not hwnd:
+        print("Roblox window not found")
+        return
+
+    rect = get_client_rect(hwnd)
+    if rect[2] <= 0 or rect[3] <= 0:
+        print("Invalid window size")
+        return
+
+    frame = capture_window(rect)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    for name, template in templates:
+        res = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF_NORMED)
+        _, max_val, _, _ = cv2.minMaxLoc(res)
+
+        if max_val >= THRESHOLD:
+            print(f"Disconnect detected using {name} ({max_val:.2f})")
+
+            h, w, _ = frame.shape
+            x1 = int(w * NUMBER_REGION1[0])
+            y1 = int(h * NUMBER_REGION1[1])
+            x2 = int(w * NUMBER_REGION1[2])
+            y2 = int(h * NUMBER_REGION1[3])
+
+            roi = frame[y1:y2, x1:x2]
+            cv2.imwrite(os.path.join(_IMAGES, "debug_roi.png"), roi)
+
+            # ----- Signal AHK (UNCHANGED VARIABLE) -----
+            digits = extract_digits(roi, mode="single")
+
+            if digits.isdigit() and len(digits) == 4:
+                with open(SIGNAL_FILE, "w") as f:
+                    f.write(digits)
+                print("Signal file created with digits:", digits)
+            else:
+                print("OCR failed or incomplete:", digits)
+
+            time.sleep(5)
+            break
+
+
+class DetectHandler(FileSystemEventHandler):
+    def __init__(self, templates):
+        super().__init__()
+        self.templates = templates
+        self._processing = False
+
+    def on_created(self, event):
+        if event.is_directory:
+            return
+        if os.path.abspath(event.src_path) != os.path.abspath(DETECT_FILE):
+            return
+        if self._processing:
+            return
+        self._processing = True
+        try:
+            try:
+                os.remove(DETECT_FILE)
+            except (PermissionError, FileNotFoundError):
+                return
+            handle_detect(self.templates)
+        finally:
+            self._processing = False
+
+
 def main():
     templates = load_templates()
     if not templates:
@@ -135,107 +205,17 @@ def main():
     print("Roblox reconnect detector started")
     print("Loaded templates:", [t[0] for t in templates])
 
-    while True:
-        if not os.path.exists(DETECT_FILE):
-            time.sleep(0.5)
-            continue
-
-        try:
-            os.remove(DETECT_FILE)
-        except PermissionError:
-            # AHK still writing — just retry next loop
-            time.sleep(0.2)
-            continue
-        hwnd = find_roblox_window()
-        if not hwnd:
-            print("Roblox window not found")
-            time.sleep(2)
-            continue
-
-        rect = get_client_rect(hwnd)
-        if rect[2] <= 0 or rect[3] <= 0:
-            print("Invalid window size")
-            time.sleep(2)
-            continue
-
-        frame = capture_window(rect)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-        # ===== ALWAYS CHECK LEADERBOARD FIRST =====
-        # if is_fifth_player_present(frame):
-        #     print("5th player detected → sending DELETE")
-        #     h, w, _ = frame.shape
-
-        #     x = int(w * FIFTH_ROW_CHECK[0])
-        #     y = int(h * FIFTH_ROW_CHECK[1])
-        #     debug = frame.copy()
-
-        #     # red dot (the pixel)
-        #     cv2.circle(debug, (x, y), 6, (0, 0, 255), -1)
-
-        #     # optional: draw small box around it
-        #     cv2.rectangle(debug, (x-10, y-10), (x+10, y+10), (0, 255, 0), 2)
-
-        #     # save image so you can inspect
-        #     cv2.imwrite(os.path.join(_IMAGES, "debug_pixel_delete.png"), debug)
-
-        #     with open(DELETE_FILE, "w") as f:
-        #         f.write("delete")
-
-        #     time.sleep(2)
-        #     continue   # skip everything else this loop
-        # time.sleep(4)  # small delay before template checks
-        for name, template in templates:
-            res = cv2.matchTemplate(gray, template, cv2.TM_CCOEFF_NORMED)
-            _, max_val, _, _ = cv2.minMaxLoc(res)
-
-            if max_val >= THRESHOLD:
-                print(f"Disconnect detected using {name} ({max_val:.2f})")
-
-                # ----- OCR number (ADDED) -----
-                h, w, _ = frame.shape
-                x1 = int(w * NUMBER_REGION1[0])
-                y1 = int(h * NUMBER_REGION1[1])
-                x2 = int(w * NUMBER_REGION1[2])
-                y2 = int(h * NUMBER_REGION1[3])
-
-                roi = frame[y1:y2, x1:x2]
-                cv2.imwrite(os.path.join(_IMAGES, "debug_roi.png"), roi)
-                
-                # ----- Signal AHK (UNCHANGED VARIABLE) -----
-                digits = extract_digits(roi, mode="single")
-
-                if digits.isdigit() and len(digits) == 4:
-                    with open(SIGNAL_FILE, "w") as f:
-                        f.write(digits)
-                    print("Signal file created with digits:", digits)
-                else:
-                    print("OCR failed or incomplete:", digits)
-  
-                time.sleep(1)
-                # frame = capture_window(rect)
-
-                # h, w, _ = frame.shape
-                # x1 = int(w * NUMBER_REGION2[0])
-                # y1 = int(h * NUMBER_REGION2[1])
-                # x2 = int(w * NUMBER_REGION2[2])
-                # y2 = int(h * NUMBER_REGION2[3])
-
-                # roi = frame[y1:y2, x1:x2]
-                # cv2.imwrite(os.path.join(_IMAGES, "debug_input.png"), roi)
-                # digits = extract_digits(roi , mode="multiple")
-                # digits = "2346789015"
-                # if digits.isdigit():
-                #     with open(SIGNAL_FILE, "w") as f:
-                #         f.write(digits)
-                #     print("Signal file created with digits:", digits)
-                # else:
-                #     print("OCR failed or incomplete:", digits)
-                time.sleep(5)
-                break
-            
-
-        time.sleep(CHECK_INTERVAL)
+    handler = DetectHandler(templates)
+    observer = Observer()
+    observer.schedule(handler, path=_ROOT, recursive=False)
+    observer.start()
+    print(f"Watching for {DETECT_FILE} ...")
+    try:
+        while observer.is_alive():
+            observer.join(timeout=1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
 
 
 if __name__ == "__main__":

@@ -1,16 +1,78 @@
-#Requires AutoHotkey v2.0
+﻿#Requires AutoHotkey v2.0
 #UseHook
-SendMode "Input"
+SendMode "Event"
 
-RECONNECT_FILE := A_ScriptDir "\..\.\reconnect.txt"  ; 
+global RobloxWindows := []
+RECONNECT_FILE := A_ScriptDir "\..\.\reconnect.txt"
 global Code := ""
 global Pos := ""
 global Coord := [171,226,274,321,373,422,473,523,574,624,624]
 global CoordY := 234
-global RobloxWindows := []
 global idx := 1
 global DetectInProgress := false
 global ManaStage := 0
+
+; ========================================
+; START MACRO (CTRL + M)
+; ========================================
+^m::
+{
+    global DetectInProgress, ManaStage
+    ManaStage := 0
+    DetectInProgress := false
+    InitRobloxWindows()
+    SetTimer Manafarm, 1000
+}
+
+; ========================================
+; STOP MACRO (CTRL + N)
+; ========================================
+^n::
+{
+    global DetectInProgress, ManaStage
+    ManaStage := 0
+    DetectInProgress := true
+    SetTimer Manafarm, 0
+}
+
+^e::
+{
+    StageTwo()
+}
+
+^y::
+{
+    StageThree()
+}
+
+^x::
+{
+    InitRobloxWindows()
+    TestCheck()
+}
+
+^b::
+{
+    InitRobloxWindows()
+}
+
+^k::
+{
+    hwnd := WinActive("A")
+    MsgBox WinGetProcessName("ahk_id " hwnd)
+}
+
+; ========================================
+IsWindowAlive(hwnd)
+{
+    return hwnd && WinExist("ahk_id " hwnd)
+}
+
+Activate(hwnd)
+{
+    DllCall("SetForegroundWindow", "ptr", hwnd)
+    Sleep 200
+}
 
 InitRobloxWindows()
 {
@@ -18,15 +80,56 @@ InitRobloxWindows()
     idx := 1
     RobloxWindows := []
 
-    ; Get all Roblox client windows
     for hwnd in WinGetList("ahk_exe RobloxPlayerBeta.exe")
-    {   
+    {
         RobloxWindows.Push(hwnd)
     }
 }
-IsWindowAlive(hwnd)
+
+Move(Key, Second)
 {
-    return hwnd && WinExist("ahk_id " hwnd)
+    SendEvent "{" . Key . " down}"
+    Sleep Second
+    SendEvent "{" . Key . " up}"
+}
+
+StageOne()
+{
+    Move("w", 3600)
+}
+
+StageTwo()
+{
+    Move("s", 900)
+    Move("a", 6000)
+    Sleep 1000
+}
+
+StageThree()
+{
+    SendEvent "{Space down}"
+    Move("a", 4800)
+    SendEvent "{Space up}"
+}
+TestCheck()
+{
+    detectFile := A_ScriptDir "\\..\detect.txt"
+    if !FileExist(detectFile)
+        FileAppend "1", detectFile
+}
+
+CheckReconnectFile()
+{
+    global RECONNECT_FILE
+
+    if FileExist(RECONNECT_FILE)
+    {
+        global Code
+        Code := Trim(FileRead(RECONNECT_FILE))
+        Sleep 500
+        FileDelete RECONNECT_FILE
+
+    }
 }
 
 Reconnect()
@@ -66,91 +169,9 @@ Reconnect()
             Sleep 500
         }
     }
-    SetTimer CheckReconnectFile, 500
-    SetTimer Manafarm, 1000   ; repeat every 500 ms
-}
-; ================= FILE WATCHER =================
-
-LogoutAndClose()
-{
-    SetTimer CheckReconnectFile, 0
-    SetTimer Manafarm, 0
-
-    for hwnd in WinGetList("ahk_exe RobloxPlayerBeta.exe")
-    {
-        ; WinClose "ahk_id " hwnd
-        ; Sleep 1000
-        ; MouseMove 250, 550
-        Sleep 500
-        ; Click 300 , 550
-    }
-    SetTimer CheckReconnectFile, 500
-    SetTimer Manafarm, 1000 
+    SetTimer Manafarm, 1000
 }
 
-CheckReconnectFile()
-{
-    global RECONNECT_FILE
-
-    if FileExist(RECONNECT_FILE)
-    {
-        global Code
-        Code := Trim(FileRead(RECONNECT_FILE))
-        FileDelete RECONNECT_FILE
-
-        if (Code = "delete")
-        {
-            LogoutAndClose()
-            return
-        }
-
-        Reconnect()
-    }
-}
-
-
-Move(Key, Second)
-{
-    Send "{" . Key . " down}"
-    Sleep Second
-    Send "{" . Key . " up}"
-}
-
-^m::
-{
-    global DetectInProgress, ManaStage
-    ManaStage := 0
-    DetectInProgress := false
-    InitRobloxWindows()
-    SetTimer CheckReconnectFile, 500
-    SetTimer Manafarm, 1000   ; repeat every 500 ms
-}
-
-^n::
-{
-    global DetectInProgress, ManaStage
-    ManaStage := 0
-    DetectInProgress := true
-    SetTimer Manafarm, 0
-    SetTimer CheckReconnectFile, 0
-}
-
-StageOne()
-{
-    Move("w", 3600)
-}
-StageTwo()
-{
-    Move("s", 900)
-    Move("a", 6000)
-    Sleep 1000
-}
-StageThree()
-{
-    Send "{Space down}"
-    Move("a", 4800)
-    Send "{Space up}"
-}
 Manafarm()
 {
     global RobloxWindows, idx, DetectInProgress, ManaStage
@@ -167,10 +188,9 @@ Manafarm()
             if DetectInProgress
                 return
             hwnd := RobloxWindows[idx]
-            WinActivate "ahk_id " . hwnd
-            WinWaitActive "ahk_id " . hwnd, , 1
+            Activate(hwnd)
             Sleep 200
-            Send "2"
+            SendEvent "2"
             Sleep 200
             idx++
             if idx > RobloxWindows.Length
@@ -185,14 +205,14 @@ Manafarm()
                     return
                 Count++
                 hwnd := RobloxWindows[idx]
-                if !IsWindowAlive(hwnd) {
+                if !IsWindowAlive(hwnd)
+                {
                     RobloxWindows.RemoveAt(idx)
                     continue
                 }
-                WinActivate "ahk_id " . hwnd
-                WinWaitActive "ahk_id " . hwnd, , 1
+                Activate(hwnd)
                 Sleep 200
-                Send "r"
+                SendEvent "r"
                 Sleep 200
                 if Count = RobloxWindows.Length
                     break
@@ -200,25 +220,23 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
-            ; Send "{Tab}"
-            ; Sleep 500
-            ; TestCheck()
-            ; Sleep 2000
-            ; Send "{Tab}"
-            ; Sleep 1500
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 7500
-        }
+            Sleep 7500            CheckReconnectFile()
+            if Code
+            {
+                Reconnect()
+                Code := ""
+                return
+            }        }
         idx := 1
         loop RobloxWindows.Length
         {
             if DetectInProgress
                 return
             hwnd := RobloxWindows[idx]
-            WinActivate "ahk_id " . hwnd
-            WinWaitActive "ahk_id " . hwnd, , 1
+            Activate(hwnd)
             Sleep 200
             StageOne()
             Sleep 200
@@ -242,14 +260,14 @@ Manafarm()
                     return
                 Count++
                 hwnd := RobloxWindows[idx]
-                if !IsWindowAlive(hwnd) {
+                if !IsWindowAlive(hwnd)
+                {
                     RobloxWindows.RemoveAt(idx)
                     continue
                 }
-                WinActivate "ahk_id " . hwnd
-                WinWaitActive "ahk_id " . hwnd, , 1
+                Activate(hwnd)
                 Sleep 200
-                Send "r"
+                SendEvent "r"
                 Sleep 200
                 if Count = RobloxWindows.Length
                     break
@@ -257,25 +275,23 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
-            ; Send "{Tab}"
-            ; Sleep 500
-            ; TestCheck()
-            ; Sleep 2000
-            ; Send "{Tab}"
-            ; Sleep 1500
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 7500
-        }
+            Sleep 7500            CheckReconnectFile()
+            if Code
+            {
+                Reconnect()
+                Code := ""
+                return
+            }        }
         idx := 1
         loop RobloxWindows.Length
         {
             if DetectInProgress
                 return
             hwnd := RobloxWindows[idx]
-            WinActivate "ahk_id " . hwnd
-            WinWaitActive "ahk_id " . hwnd, , 1
+            Activate(hwnd)
             Sleep 200
             StageTwo()
             Sleep 200
@@ -299,14 +315,14 @@ Manafarm()
                     return
                 Count++
                 hwnd := RobloxWindows[idx]
-                if !IsWindowAlive(hwnd) {
+                if !IsWindowAlive(hwnd)
+                {
                     RobloxWindows.RemoveAt(idx)
                     continue
                 }
-                WinActivate "ahk_id " . hwnd
-                WinWaitActive "ahk_id " . hwnd, , 1
+                Activate(hwnd)
                 Sleep 200
-                Send "r"
+                SendEvent "r"
                 Sleep 200
                 if Count = RobloxWindows.Length
                     break
@@ -314,25 +330,23 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
-            ; Send "{Tab}"
-            ; Sleep 500
-            ; TestCheck()
-            ; Sleep 2000
-            ; Send "{Tab}"
-            ; Sleep 1500
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 7500
-        }
+            Sleep 7500            CheckReconnectFile()
+            if Code
+            {
+                Reconnect()
+                Code := ""
+                return
+            }        }
         idx := 1
         loop RobloxWindows.Length
         {
             if DetectInProgress
                 return
             hwnd := RobloxWindows[idx]
-            WinActivate "ahk_id " . hwnd
-            WinWaitActive "ahk_id " . hwnd, , 1
+            Activate(hwnd)
             Sleep 200
             StageThree()
             Sleep 200
@@ -356,14 +370,14 @@ Manafarm()
                     return
                 Count++
                 hwnd := RobloxWindows[idx]
-                if !IsWindowAlive(hwnd) {
+                if !IsWindowAlive(hwnd)
+                {
                     RobloxWindows.RemoveAt(idx)
                     continue
                 }
-                WinActivate "ahk_id " . hwnd
-                WinWaitActive "ahk_id " . hwnd, , 1
+                Activate(hwnd)
                 Sleep 200
-                Send "r"
+                SendEvent "r"
                 Sleep 200
                 if Count = RobloxWindows.Length
                     break
@@ -375,36 +389,4 @@ Manafarm()
         }
         ManaStage := 0
     }
-}
-
-^r::
-{
-  DoThis()
-}
-^e::{
-    StageTwo()
-}
-^y::
-{
-    StageThree()
-}
-DoThis()
-{
-    StageOne()
-}
-^x::
-{
-    InitRobloxWindows()
-    TestCheck()
-}
-^b::
-{
-    InitRobloxWindows()
-    LogoutAndClose()
-}
-TestCheck()
-{
-    detectFile := A_ScriptDir "\\..\detect.txt"
-        if !FileExist(detectFile)
-            FileAppend "1", detectFile
 }

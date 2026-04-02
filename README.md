@@ -47,7 +47,7 @@ pip install opencv-python numpy mss pywin32 pytesseract
   ```python
   pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
   ```
-- Make sure to add `Tesseract-OCR\bin` to enviroment 
+- Make sure to add `C:\Program Files\Tesseract-OCR` to your system PATH (there is no `bin` subfolder — the exe is directly in that folder)
 
 ---
 
