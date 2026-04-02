@@ -174,7 +174,7 @@ Reconnect()
 
 Manafarm()
 {
-    global RobloxWindows, idx, DetectInProgress, ManaStage
+    global RobloxWindows, idx, DetectInProgress, ManaStage, Code
 
     if DetectInProgress
         return
@@ -189,7 +189,7 @@ Manafarm()
                 return
             hwnd := RobloxWindows[idx]
             Activate(hwnd)
-            Sleep 200
+
             SendEvent "2"
             Sleep 200
             idx++
@@ -211,7 +211,6 @@ Manafarm()
                     continue
                 }
                 Activate(hwnd)
-                Sleep 200
                 SendEvent "r"
                 Sleep 200
                 if Count = RobloxWindows.Length
@@ -223,13 +222,16 @@ Manafarm()
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 7500            CheckReconnectFile()
+            Sleep 3000            
+            CheckReconnectFile()
             if Code
             {
                 Reconnect()
                 Code := ""
                 return
-            }        }
+            }   
+            Sleep 4600
+        }
         idx := 1
         loop RobloxWindows.Length
         {
@@ -237,7 +239,6 @@ Manafarm()
                 return
             hwnd := RobloxWindows[idx]
             Activate(hwnd)
-            Sleep 200
             StageOne()
             Sleep 200
             idx++
@@ -266,7 +267,6 @@ Manafarm()
                     continue
                 }
                 Activate(hwnd)
-                Sleep 200
                 SendEvent "r"
                 Sleep 200
                 if Count = RobloxWindows.Length
@@ -278,13 +278,16 @@ Manafarm()
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 7500            CheckReconnectFile()
+            Sleep 3000            
+            CheckReconnectFile()
             if Code
             {
                 Reconnect()
                 Code := ""
                 return
-            }        }
+            }   
+            Sleep 4600
+        }
         idx := 1
         loop RobloxWindows.Length
         {
@@ -292,7 +295,6 @@ Manafarm()
                 return
             hwnd := RobloxWindows[idx]
             Activate(hwnd)
-            Sleep 200
             StageTwo()
             Sleep 200
             idx++
@@ -321,7 +323,6 @@ Manafarm()
                     continue
                 }
                 Activate(hwnd)
-                Sleep 200
                 SendEvent "r"
                 Sleep 200
                 if Count = RobloxWindows.Length
@@ -333,13 +334,16 @@ Manafarm()
             detectFile := A_ScriptDir "\\..\detect.txt"
             if !FileExist(detectFile)
                 FileAppend "1", detectFile
-            Sleep 7500            CheckReconnectFile()
+            Sleep 3000            
+            CheckReconnectFile()
             if Code
             {
                 Reconnect()
                 Code := ""
                 return
-            }        }
+            }   
+            Sleep 4600
+        }
         idx := 1
         loop RobloxWindows.Length
         {
@@ -347,7 +351,6 @@ Manafarm()
                 return
             hwnd := RobloxWindows[idx]
             Activate(hwnd)
-            Sleep 200
             StageThree()
             Sleep 200
             idx++
@@ -376,7 +379,6 @@ Manafarm()
                     continue
                 }
                 Activate(hwnd)
-                Sleep 200
                 SendEvent "r"
                 Sleep 200
                 if Count = RobloxWindows.Length
@@ -385,7 +387,7 @@ Manafarm()
                 if idx > RobloxWindows.Length
                     idx := 1
             }
-            Sleep 7500
+            Sleep 7600
         }
         ManaStage := 0
     }
