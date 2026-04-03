@@ -143,6 +143,7 @@ Reconnect()
 
 StatisCheck()
 {
+    global RobloxWindows, idx, DetectInProgress
     Loop RobloxWindows.Length
     {
         if DetectInProgress
