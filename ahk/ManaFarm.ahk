@@ -1,4 +1,4 @@
-﻿#Requires AutoHotkey v2.0
+#Requires AutoHotkey v2.0
 #UseHook
 SendMode "Event"
 
@@ -114,8 +114,20 @@ StageThree()
 TestCheck()
 {
     detectFile := A_ScriptDir "\\..\detect.txt"
-    if !FileExist(detectFile)
-        FileAppend "1", detectFile
+    Loop 5
+    {
+        try
+        {
+            if FileExist(detectFile)
+                FileDelete detectFile
+            FileAppend "1", detectFile
+            break
+        }
+        catch
+        {
+            Sleep 200
+        }
+    }
 }
 
 CheckReconnectFile()
@@ -182,19 +194,15 @@ Manafarm()
     ; --- Stage 0: starting spot ---------------------------------------------------
     if (ManaStage = 0)
     {
-        idx := 1
         loop RobloxWindows.Length
         {
             if DetectInProgress
                 return
-            hwnd := RobloxWindows[idx]
+            hwnd := RobloxWindows[A_Index]
             Activate(hwnd)
 
             SendEvent "2"
             Sleep 200
-            idx++
-            if idx > RobloxWindows.Length
-                idx := 1
         }
         loop 3
         {
@@ -220,8 +228,20 @@ Manafarm()
                     idx := 1
             }
             detectFile := A_ScriptDir "\\..\detect.txt"
-            if !FileExist(detectFile)
-                FileAppend "1", detectFile
+            Loop 5
+            {
+                try
+                {
+                    if FileExist(detectFile)
+                        FileDelete detectFile
+                    FileAppend "1", detectFile
+                    break
+                }
+                catch
+                {
+                    Sleep 200
+                }
+            }
             Sleep 3000            
             CheckReconnectFile()
             if Code
@@ -232,18 +252,14 @@ Manafarm()
             }   
             Sleep 4600
         }
-        idx := 1
         loop RobloxWindows.Length
         {
             if DetectInProgress
                 return
-            hwnd := RobloxWindows[idx]
+            hwnd := RobloxWindows[A_Index]
             Activate(hwnd)
             StageOne()
             Sleep 200
-            idx++
-            if idx > RobloxWindows.Length
-                idx := 1
         }
         ManaStage := 1
     }
@@ -251,7 +267,6 @@ Manafarm()
     ; --- Stage 1: after StageOne --------------------------------------------------
     if (ManaStage = 1)
     {
-        idx := 1
         loop 3
         {
             Count := 0
@@ -276,8 +291,20 @@ Manafarm()
                     idx := 1
             }
             detectFile := A_ScriptDir "\\..\detect.txt"
-            if !FileExist(detectFile)
-                FileAppend "1", detectFile
+            Loop 5
+            {
+                try
+                {
+                    if FileExist(detectFile)
+                        FileDelete detectFile
+                    FileAppend "1", detectFile
+                    break
+                }
+                catch
+                {
+                    Sleep 200
+                }
+            }
             Sleep 3000            
             CheckReconnectFile()
             if Code
@@ -288,18 +315,14 @@ Manafarm()
             }   
             Sleep 4600
         }
-        idx := 1
         loop RobloxWindows.Length
         {
             if DetectInProgress
                 return
-            hwnd := RobloxWindows[idx]
+            hwnd := RobloxWindows[A_Index]
             Activate(hwnd)
             StageTwo()
             Sleep 200
-            idx++
-            if idx > RobloxWindows.Length
-                idx := 1
         }
         ManaStage := 2
     }
@@ -307,7 +330,6 @@ Manafarm()
     ; --- Stage 2: after StageTwo --------------------------------------------------
     if (ManaStage = 2)
     {
-        idx := 1
         loop 1
         {
             Count := 0
@@ -332,8 +354,20 @@ Manafarm()
                     idx := 1
             }
             detectFile := A_ScriptDir "\\..\detect.txt"
-            if !FileExist(detectFile)
-                FileAppend "1", detectFile
+            Loop 5
+            {
+                try
+                {
+                    if FileExist(detectFile)
+                        FileDelete detectFile
+                    FileAppend "1", detectFile
+                    break
+                }
+                catch
+                {
+                    Sleep 200
+                }
+            }
             Sleep 3000            
             CheckReconnectFile()
             if Code
@@ -344,18 +378,14 @@ Manafarm()
             }   
             Sleep 4600
         }
-        idx := 1
         loop RobloxWindows.Length
         {
             if DetectInProgress
                 return
-            hwnd := RobloxWindows[idx]
+            hwnd := RobloxWindows[A_Index]
             Activate(hwnd)
             StageThree()
             Sleep 200
-            idx++
-            if idx > RobloxWindows.Length
-                idx := 1
         }
         ManaStage := 3
     }
@@ -363,7 +393,6 @@ Manafarm()
     ; --- Stage 3: after StageThree ------------------------------------------------
     if (ManaStage = 3)
     {
-        idx := 1
         loop 3
         {
             Count := 0

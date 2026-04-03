@@ -49,10 +49,6 @@ global CrabKilled := 0
 ^t::
 {
     global Running
-
-    if Running
-        return
-
     Running := true
     StartMacro()
 }
@@ -78,7 +74,6 @@ IsWindowAlive(hwnd)
 Activate(hwnd)
 {
     DllCall("SetForegroundWindow", "ptr", hwnd)
-    Sleep 250
 }
 
 SendKey(key)
@@ -150,7 +145,7 @@ LoopWindows()
         Sleep 150
     }
 
-    Sleep 8000
+    Sleep 8500
 
     ; ========================================
     ; R / T LOGIC
@@ -168,20 +163,17 @@ LoopWindows()
 
         Activate(hwnd)
 
-        if (Index = 1)
-        {
-            Sleep 200
-            SendKey("r")
-            Sleep 1000
-            SendKey("t")
-            Break
-        }
-
-        Sleep 200
+        ; if (Index = 1)
+        ; {
+        ;     SendKey("r")
+        ;     Sleep 1000
+        ;     SendKey("t")
+        ;     Break
+        ; }
         SendKey("r")
     }
 
-    Sleep 6000
+    Sleep 8500
     Loop RobloxWindows.Length-1
     {
         if !Running
@@ -197,26 +189,71 @@ LoopWindows()
 
         if (Index = 1)
         {
-            Sleep 200
+            ; Sleep 200
             SendKey("r")
-            ; Sleep 1000
-            ; SendKey("t")
+            Sleep 1000
+            SendKey("t")
             Break
         }
-
-        Sleep 200
         SendKey("r")
     }
 
     CrabKilled++
-    ToolTip "Crabby: " CrabKilled
-    SetTimer () => ToolTip(), -10
     TimeElapse := 0
     if (CrabKilled = 11)
     {
         CrabKilled := 0
         Terminate()
-        Sleep 60000
+        Sleep 2000
+        Terminate()
+        Sleep 1000
+        Loop RobloxWindows.Length
+        {
+            if !Running
+                return
+
+            Index := RobloxWindows.Length - A_Index + 1
+            hwnd := RobloxWindows[Index]
+
+            if !IsWindowAlive(hwnd)
+                continue
+
+            Activate(hwnd)
+
+            detectFile := A_ScriptDir "\\..\detect.txt"
+
+            Loop 5
+            {
+                try
+                {
+                    if FileExist(detectFile)
+                        FileDelete detectFile
+                    FileAppend "1", detectFile
+                    break
+                }
+                catch
+                {
+                    TimeElapse += 200
+                    Sleep 200
+                }
+            }
+
+            TimeElapse += 3000
+            Sleep 3000
+
+            CheckReconnectFile()
+            TimeElapse += 200
+            Sleep 200
+
+            if Code
+            {
+                TimeElapse += 6700
+                Reconnect()
+                Code := ""
+                Break
+            }
+        }
+        Sleep 20000
         OpenGate()
         return
     }
@@ -246,7 +283,6 @@ LoopWindows()
             Break
         }
 
-        Sleep 200
         SendEvent "{d down}"
         Sleep 400
         SendEvent "{d up}"
@@ -254,7 +290,7 @@ LoopWindows()
         SendEvent "{w down}"
         Sleep 300
         SendEvent "{w up}"
-        TimeElapse += 1100
+        TimeElapse += 900
     }
 
     
@@ -284,7 +320,7 @@ LoopWindows()
             }
             catch
             {
-                TimeElapse += 3000
+                TimeElapse += 200
                 Sleep 200
             }
         }
@@ -305,7 +341,7 @@ LoopWindows()
         }
     }
 
-    Sleep Max(0, 29500 - TimeElapse)
+    Sleep Max(0, 31000 - TimeElapse)
 }
 
 CheckReconnectFile()
@@ -377,21 +413,17 @@ Terminate()
         Activate(hwnd)
         Sleep 200
         SendKey("{Escape}")
-        Sleep 1000
+        Sleep 500
         SendKey("r")
-        Sleep 1000
+        Sleep 500
 
         Click 290 , 365 
-        Sleep 1000
-        Click 290 , 270
-        Sleep 1000
-
-      
+        Sleep 500
+        Click 300 , 365
+        Sleep 500
     }
 }
 ^m::
 {
-    SendEvent "{s down}"
-    Sleep 500
-    SendEvent "{s up}"
+    Terminate()
 }

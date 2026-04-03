@@ -20,7 +20,8 @@ global DetectInProgress := false
     global DetectInProgress
     DetectInProgress := false
     InitRobloxWindows()
-    SetTimer StatisCheck, 1000
+    ; SetTimer StatisCheck, 1000
+    SetTimer StandStillAFK, 100
 
 }
 
@@ -32,6 +33,7 @@ global DetectInProgress := false
     global DetectInProgress
     DetectInProgress := true
     SetTimer StatisCheck, 0
+    SetTimer StandStillAFK, 0
 }
 
 ; ^x::
@@ -60,7 +62,7 @@ IsWindowAlive(hwnd)
 Activate(hwnd)
 {
     DllCall("SetForegroundWindow", "ptr", hwnd)
-    Sleep 200
+    ; Sleep 100
 }
 
 InitRobloxWindows()
@@ -85,8 +87,20 @@ Move(Key, Second)
 TestCheck()
 {
     detectFile := A_ScriptDir "\\..\detect.txt"
-    if !FileExist(detectFile)
-        FileAppend "1", detectFile
+    Loop 5
+    {
+        try
+        {
+            if FileExist(detectFile)
+                FileDelete detectFile
+            FileAppend "1", detectFile
+            break
+        }
+        catch
+        {
+            Sleep 200
+        }
+    }
 }
 
 CheckReconnectFile()
@@ -138,7 +152,8 @@ Reconnect()
             Sleep 500
         }
     }
-    SetTimer StatisCheck, 1000
+    ; SetTimer StatisCheck, 1000
+    SetTimer StandStillAFK, 1000
 }
 
 StatisCheck()
@@ -153,8 +168,20 @@ StatisCheck()
         Sleep 100
         Send "a"
         detectFile := A_ScriptDir "\\..\detect.txt"
-        if !FileExist(detectFile)
-            FileAppend "1", detectFile
+        Loop 5
+        {
+            try
+            {
+                if FileExist(detectFile)
+                    FileDelete detectFile
+                FileAppend "1", detectFile
+                break
+            }
+            catch
+            {
+                Sleep 200
+            }
+        }
         Sleep 3000            
         CheckReconnectFile()
         if Code
@@ -170,3 +197,68 @@ StatisCheck()
     }
 }
 
+StandStillAFK()
+{
+    global RobloxWindows, idx, DetectInProgress, Code
+
+    Loop RobloxWindows.Length
+    {
+        if DetectInProgress
+            return
+        hwnd := RobloxWindows[idx]
+        Activate(hwnd)
+        Send "2"
+        Send "r"
+
+        idx++
+        if idx > RobloxWindows.Length
+            idx := 1
+    }
+    TimeElapse := 0
+    Loop RobloxWindows.Length
+    {
+        if DetectInProgress
+            return
+
+        Index := RobloxWindows.Length - A_Index + 1
+        hwnd := RobloxWindows[Index]
+
+        if !IsWindowAlive(hwnd)
+            continue
+
+        Activate(hwnd)
+
+        detectFile := A_ScriptDir "\\..\detect.txt"
+
+        Loop 5
+        {
+            try
+            {
+                if FileExist(detectFile)
+                    FileDelete detectFile
+                FileAppend "1", detectFile
+                break
+            }
+            catch
+            {
+                Sleep 200
+            }
+        }
+
+        TimeElapse += 3000
+        Sleep 3000
+
+        CheckReconnectFile()
+        TimeElapse += 500
+        Sleep 500
+
+        if Code
+        {
+            TimeElapse += 6700
+            Reconnect()
+            Code := ""
+            Break
+        }
+    }
+    Sleep Max(0, 36500 - TimeElapse)
+}
