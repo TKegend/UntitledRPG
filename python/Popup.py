@@ -184,6 +184,10 @@ class DetectHandler(FileSystemEventHandler):
         if os.path.abspath(event.src_path) != os.path.abspath(DETECT_FILE):
             return
         if self._processing:
+            try:
+                os.remove(DETECT_FILE)
+            except (PermissionError, FileNotFoundError):
+                pass
             return
         self._processing = True
         try:
