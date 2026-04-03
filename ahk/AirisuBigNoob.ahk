@@ -150,6 +150,8 @@ StatisCheck()
             return
         hwnd := RobloxWindows[idx]
         Activate(hwnd)
+        Sleep 100
+        Send "a"
         detectFile := A_ScriptDir "\\..\detect.txt"
         if !FileExist(detectFile)
             FileAppend "1", detectFile
