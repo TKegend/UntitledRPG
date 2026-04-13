@@ -216,7 +216,9 @@ LoopWindows()
     {
         CrabKilled := 0
         Terminate()
-        Sleep 60000
+        Sleep 1000
+        Terminate()
+        Sleep 40000
         OpenGate()
         return
     }
@@ -377,14 +379,14 @@ Terminate()
         Activate(hwnd)
         Sleep 200
         SendKey("{Escape}")
-        Sleep 1000
+        Sleep 500
         SendKey("r")
-        Sleep 1000
+        Sleep 500
 
         Click 290 , 365 
-        Sleep 1000
+        Sleep 500
         Click 290 , 270
-        Sleep 1000
+        Sleep 500
 
       
     }
