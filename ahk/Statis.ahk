@@ -24,7 +24,18 @@ global DetectInProgress := false
     SetTimer StandStillAFK, 100
 
 }
+^l::
+{
+    SetTimer DoThis, 100
+}
 
+
+
+DoThis()
+{
+    Send "e"
+    Send "r"
+}
 ; ========================================
 ; STOP MACRO (CTRL + N)
 ; ========================================

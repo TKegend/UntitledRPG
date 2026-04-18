@@ -163,17 +163,17 @@ LoopWindows()
 
         Activate(hwnd)
 
-        ; if (Index = 1)
-        ; {
-        ;     SendKey("r")
-        ;     Sleep 1000
-        ;     SendKey("t")
-        ;     Break
-        ; }
+        if (Index = 1)
+        {
+            SendKey("r")
+            Sleep 1000
+            SendKey("t")
+            Break
+        }
         SendKey("r")
     }
 
-    Sleep 8500
+    Sleep 7500
     Loop RobloxWindows.Length-1
     {
         if !Running
@@ -187,14 +187,14 @@ LoopWindows()
 
         Activate(hwnd)
 
-        if (Index = 1)
-        {
-            ; Sleep 200
-            SendKey("r")
-            Sleep 1000
-            SendKey("t")
-            Break
-        }
+        ; if (Index = 1)
+        ; {
+        ;     ; Sleep 200
+        ;     SendKey("r")
+        ;     Sleep 1000
+        ;     SendKey("t")
+        ;     Break
+        ; }
         SendKey("r")
     }
 
@@ -270,8 +270,8 @@ LoopWindows()
             continue
 
         Activate(hwnd)
-        Sleep 200
-        TimeElapse += 200
+        Sleep 400
+        TimeElapse += 400
 
         if (Index = 1)
         {
@@ -341,7 +341,7 @@ LoopWindows()
         }
     }
 
-    Sleep Max(0, 31000 - TimeElapse)
+    Sleep Max(0, 31200 - TimeElapse)
 }
 
 CheckReconnectFile()

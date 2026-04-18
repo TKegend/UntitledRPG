@@ -1,3 +1,2 @@
 venv/
-images/*.png
-images/
+images/debug_*.png

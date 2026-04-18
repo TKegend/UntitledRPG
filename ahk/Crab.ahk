@@ -75,10 +75,10 @@ IsWindowAlive(hwnd)
     return hwnd && WinExist("ahk_id " hwnd)
 }
 
-Activate(hwnd)
+Activate(hwnd,time)
 {
     DllCall("SetForegroundWindow", "ptr", hwnd)
-    Sleep 250
+    Sleep time
 }
 
 SendKey(key)
@@ -101,7 +101,7 @@ OpenGate()
 
     hwnd := RobloxWindows[RobloxWindows.Length]
 
-    Activate(hwnd)
+    Activate(hwnd, 200)
     SendKey("2")
     Sleep 1000
     SendEvent "{e down}"
@@ -122,6 +122,7 @@ LoopWindows()
     if RobloxWindows.Length = 0
         return
 
+    TimeElapse := 0
     ; ========================================
     ; SEND 5
     ; ========================================
@@ -130,12 +131,13 @@ LoopWindows()
         Index := RobloxWindows.Length - 1 - A_Index + 1
         hwnd := RobloxWindows[Index]
 
-        Activate(hwnd)
+        Activate(hwnd, 250)
         SendKey("5")
         Sleep 200
+        TimeElapse += 450
     }
 
-    Sleep 3200
+    Sleep 3000
 
     ; ========================================
     ; SEND 2
@@ -145,7 +147,7 @@ LoopWindows()
         Index := RobloxWindows.Length - 1 - A_Index + 1
         hwnd := RobloxWindows[Index]
 
-        Activate(hwnd)
+        Activate(hwnd, 250)
         SendKey("2")
         Sleep 150
     }
@@ -166,7 +168,7 @@ LoopWindows()
         if !IsWindowAlive(hwnd)
             continue
 
-        Activate(hwnd)
+        Activate(hwnd, 250)
 
         if (Index = 1)
         {
@@ -181,7 +183,7 @@ LoopWindows()
         SendKey("r")
     }
 
-    Sleep 6000
+    Sleep 6100
     Loop RobloxWindows.Length-1
     {
         if !Running
@@ -193,7 +195,7 @@ LoopWindows()
         if !IsWindowAlive(hwnd)
             continue
 
-        Activate(hwnd)
+        Activate(hwnd, 250)
 
         if (Index = 1)
         {
@@ -209,16 +211,13 @@ LoopWindows()
     }
 
     CrabKilled++
-    ToolTip "Crabby: " CrabKilled
-    SetTimer () => ToolTip(), -10
-    TimeElapse := 0
     if (CrabKilled = 11)
     {
         CrabKilled := 0
         Terminate()
         Sleep 1000
         Terminate()
-        Sleep 40000
+        Sleep 30000
         OpenGate()
         return
     }
@@ -234,9 +233,9 @@ LoopWindows()
         if !IsWindowAlive(hwnd)
             continue
 
-        Activate(hwnd)
+        Activate(hwnd, 250)
         Sleep 200
-        TimeElapse += 200
+        TimeElapse += 450
 
         if (Index = 1)
         {
@@ -271,7 +270,8 @@ LoopWindows()
         if !IsWindowAlive(hwnd)
             continue
 
-        Activate(hwnd)
+        Activate(hwnd, 250)
+        TimeElapse += 250
 
         detectFile := A_ScriptDir "\\..\detect.txt"
 
@@ -286,7 +286,7 @@ LoopWindows()
             }
             catch
             {
-                TimeElapse += 3000
+                TimeElapse += 200
                 Sleep 200
             }
         }
@@ -307,7 +307,7 @@ LoopWindows()
         }
     }
 
-    Sleep Max(0, 29500 - TimeElapse)
+    Sleep Max(0, 32500 - TimeElapse)
 }
 
 CheckReconnectFile()
@@ -376,7 +376,7 @@ Terminate()
         if !IsWindowAlive(hwnd)
             continue
 
-        Activate(hwnd)
+        Activate(hwnd, 200)
         Sleep 200
         SendKey("{Escape}")
         Sleep 500
