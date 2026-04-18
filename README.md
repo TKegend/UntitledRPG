@@ -112,7 +112,7 @@ If you've never used Git, a terminal, or Python before, follow these steps from 
 1. Go to https://github.com/UB-Mannheim/tesseract/wiki
 2. Download and run the Windows installer
 3. Install to the default path: `C:\Program Files\Tesseract-OCR\`
-4. Copy the path of the file called `exe` in Tesseract-OCR 
+4. Copy the path of the file ending in `.exe` in Tesseract-OCR or It should be the Tesseract Application Icon
 5. Go into the `..UntitledRPG\python\popup.py` and edit text using whatever you have.
 6. Ctrl + F to find `pytesseract.pytesseract.tesseract_cmd` and replace the file path in there it should look something like this `r"C:\Program Files\Tesseract-OCR\tesseract.exe"`
 
