@@ -102,14 +102,18 @@ StageOne()
 StageTwo()
 {
     Move("a", 1500)
+    Sleep 200
     Move("s", 1900)
+    Sleep 200
     Move("a", 4000)
 }
 
 StageThree()
 {
     SendEvent "{Space down}"
+    Sleep 200
     Move("a", 4800)
+    Sleep 200
     SendEvent "{Space up}"
 }
 TestCheck()
@@ -202,99 +206,6 @@ Manafarm()
             SendEvent "2"
             Sleep 200
         }
-        loop Cycle[0]
-        {
-            Count := 0
-            TempIdx := idx
-            Loop RobloxWindows.Length
-            {
-                if DetectInProgress
-                    return
-                Count++
-                hwnd := RobloxWindows[TempIdx]
-                if !IsWindowAlive(hwnd)
-                {
-                    RobloxWindows.RemoveAt(TempIdx)
-                    continue
-                }
-                Activate(hwnd, 200)
-                SendEvent "t"
-                Sleep 200
-
-                if Count = RobloxWindows.Length
-                    break
-                TempIdx++
-                if TempIdx > RobloxWindows.Length
-                    TempIdx := 1
-            }
-            Sleep 1000 - (400*(RobloxWindows.Length-1))
-            Count := 0
-            TempIdx := idx
-            Loop RobloxWindows.Length
-            {
-                if DetectInProgress
-                    return
-                Count++
-                hwnd := RobloxWindows[TempIdx]
-                if !IsWindowAlive(hwnd)
-                {
-                    RobloxWindows.RemoveAt(TempIdx)
-                    continue
-                }
-                Activate(hwnd, 200)
-                SendEvent "r"
-                Sleep 200
-
-                if Count = RobloxWindows.Length
-                    break
-                TempIdx++
-                if TempIdx > RobloxWindows.Length
-                    TempIdx := 1
-            }
-            idx := TempIdx
-            detectFile := A_ScriptDir "\\..\detect.txt"
-            Loop 5
-            {
-                try
-                {
-                    if FileExist(detectFile)
-                        FileDelete detectFile
-                    FileAppend "1", detectFile
-                    break
-                }
-                catch
-                {
-                    Sleep 200
-                }
-            }
-            Sleep 3000            
-            CheckReconnectFile()
-            if Code
-            {
-                Reconnect()
-                Code := ""
-                return
-            }   
-            if ( A_Index = Cycle[0] )
-                Sleep 300
-                break
-            Sleep 5300
-        }
-        loop RobloxWindows.Length
-        {
-            if DetectInProgress
-                return
-            hwnd := RobloxWindows[A_Index]
-            Activate(hwnd,300)
-            StageOne()
-            Sleep 200
-        }
-        ManaStage := 1
-    }
-
-    ; --- Stage 1: after StageOne --------------------------------------------------
-    if (ManaStage = 1)
-    {
         loop Cycle[1]
         {
             Count := 0
@@ -369,8 +280,10 @@ Manafarm()
                 return
             }   
             if ( A_Index = Cycle[1] )
-                Sleep 300
+            {   
+                Sleep 200
                 break
+            }
             Sleep 5300
         }
         loop RobloxWindows.Length
@@ -378,7 +291,103 @@ Manafarm()
             if DetectInProgress
                 return
             hwnd := RobloxWindows[A_Index]
-            Activate(hwnd, 300)
+            Activate(hwnd,200)
+            StageOne()
+            Sleep 200
+        }
+        ManaStage := 1
+    }
+
+    ; --- Stage 1: after StageOne --------------------------------------------------
+    if (ManaStage = 1)
+    {
+        loop Cycle[2]
+        {
+            Count := 0
+            TempIdx := idx
+            Loop RobloxWindows.Length
+            {
+                if DetectInProgress
+                    return
+                Count++
+                hwnd := RobloxWindows[TempIdx]
+                if !IsWindowAlive(hwnd)
+                {
+                    RobloxWindows.RemoveAt(TempIdx)
+                    continue
+                }
+                Activate(hwnd, 200)
+                SendEvent "t"
+                Sleep 200
+
+                if Count = RobloxWindows.Length
+                    break
+                TempIdx++
+                if TempIdx > RobloxWindows.Length
+                    TempIdx := 1
+            }
+            Sleep 1000 - (400*(RobloxWindows.Length-1))
+            Count := 0
+            TempIdx := idx
+            Loop RobloxWindows.Length
+            {
+                if DetectInProgress
+                    return
+                Count++
+                hwnd := RobloxWindows[TempIdx]
+                if !IsWindowAlive(hwnd)
+                {
+                    RobloxWindows.RemoveAt(TempIdx)
+                    continue
+                }
+                Activate(hwnd, 200)
+                SendEvent "r"
+                Sleep 200
+
+                if Count = RobloxWindows.Length
+                    break
+                TempIdx++
+                if TempIdx > RobloxWindows.Length
+                    TempIdx := 1
+            }
+            idx := TempIdx
+            detectFile := A_ScriptDir "\\..\detect.txt"
+            Loop 5
+            {
+                try
+                {
+                    if FileExist(detectFile)
+                        FileDelete detectFile
+                    FileAppend "1", detectFile
+                    break
+                }
+                catch
+                {
+                    Sleep 200
+                }
+            }
+            Sleep 3000            
+            CheckReconnectFile()
+            if Code
+            {
+                Reconnect()
+                Code := ""
+                return
+            }   
+            if ( A_Index = Cycle[2] )
+            {   
+                Sleep 200
+                break
+            }
+                
+            Sleep 5300
+        }
+        loop RobloxWindows.Length
+        {
+            if DetectInProgress
+                return
+            hwnd := RobloxWindows[A_Index]
+            Activate(hwnd, 200)
             StageTwo()
             Sleep 200
         }
@@ -388,7 +397,7 @@ Manafarm()
     ; --- Stage 2: after StageTwo --------------------------------------------------
     if (ManaStage = 2)
     {
-        loop Cycle[2]
+        loop Cycle[3]
         {
             Count := 0
             Loop RobloxWindows.Length
@@ -434,14 +443,14 @@ Manafarm()
                 Code := ""
                 return
             }   
-            Sleep 400
+            Sleep 200
         }
         loop RobloxWindows.Length
         {
             if DetectInProgress
                 return
             hwnd := RobloxWindows[A_Index]
-            Activate(hwnd,300)
+            Activate(hwnd,200)
             StageThree()
             Sleep 200
         }
@@ -451,10 +460,7 @@ Manafarm()
     ; --- Stage 3: after StageThree ------------------------------------------------
     if (ManaStage = 3)
     {
-        loop Cycle[3]
-        {
-            SendEvent "{s down}"
-            Sleep 200
+        loop Cycle[4]
         {
             Count := 0
             TempIdx := idx
@@ -532,3 +538,4 @@ Manafarm()
         ManaStage := 0
     }
 }
+
