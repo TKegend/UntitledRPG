@@ -7,6 +7,7 @@ RECONNECT_FILE := A_ScriptDir "\..\.\reconnect.txt"
 global Code := ""
 global Pos := ""
 global Coord := [171,226,274,321,373,422,473,523,574,624,624]
+global Cycle := [2,2,1,2]
 global CoordY := 234
 global idx := 1
 global DetectInProgress := false
@@ -147,9 +148,7 @@ CheckReconnectFile()
 Reconnect()
 {
     Critical
-    global Code
-    global Coord
-    global CoordY
+    global Code, Coord, CoordY
     SetTimer CheckReconnectFile, 0
     SetTimer Manafarm, 0
 
@@ -186,7 +185,7 @@ Reconnect()
 
 Manafarm()
 {
-    global RobloxWindows, idx, DetectInProgress, ManaStage, Code
+    global RobloxWindows, idx, DetectInProgress, ManaStage, Code, Cycle
 
     if DetectInProgress
         return
@@ -203,7 +202,7 @@ Manafarm()
             SendEvent "2"
             Sleep 200
         }
-        loop 2
+        loop Cycle[0]
         {
             Count := 0
             TempIdx := idx
@@ -276,6 +275,9 @@ Manafarm()
                 Code := ""
                 return
             }   
+            if ( A_Index = Cycle[0] )
+                Sleep 300
+                break
             Sleep 5300
         }
         loop RobloxWindows.Length
@@ -293,7 +295,7 @@ Manafarm()
     ; --- Stage 1: after StageOne --------------------------------------------------
     if (ManaStage = 1)
     {
-        loop 2
+        loop Cycle[1]
         {
             Count := 0
             TempIdx := idx
@@ -366,6 +368,9 @@ Manafarm()
                 Code := ""
                 return
             }   
+            if ( A_Index = Cycle[1] )
+                Sleep 300
+                break
             Sleep 5300
         }
         loop RobloxWindows.Length
@@ -383,7 +388,7 @@ Manafarm()
     ; --- Stage 2: after StageTwo --------------------------------------------------
     if (ManaStage = 2)
     {
-        loop 1
+        loop Cycle[2]
         {
             Count := 0
             Loop RobloxWindows.Length
@@ -446,7 +451,10 @@ Manafarm()
     ; --- Stage 3: after StageThree ------------------------------------------------
     if (ManaStage = 3)
     {
-        loop 2
+        loop Cycle[3]
+        {
+            SendEvent "{s down}"
+            Sleep 200
         {
             Count := 0
             TempIdx := idx
@@ -519,13 +527,8 @@ Manafarm()
                 Code := ""
                 return
             }   
-            Sleep 5300
+            Sleep 4000
         }
         ManaStage := 0
     }
-}
-
-^b::
-{
-    StageOne()
 }
