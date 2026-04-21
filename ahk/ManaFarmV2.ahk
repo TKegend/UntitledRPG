@@ -13,6 +13,33 @@ global idx := 1
 global DetectInProgress := false
 global ManaStage := 0
 
+^p::
+{
+    global RobloxWindows
+
+    hwnd := WinActive("ahk_exe RobloxPlayerBeta.exe")
+
+    if !hwnd
+    {
+        MsgBox "Focused window is not Roblox."
+        return
+    }
+
+    for w in RobloxWindows
+    {
+        if (w = hwnd)
+        {
+            ToolTip "Roblox window already added."
+            SetTimer () => ToolTip(), -1000
+            return
+        }
+    }
+
+    RobloxWindows.Push(hwnd)
+
+    ToolTip "Added Roblox window index: " RobloxWindows.Length
+    SetTimer () => ToolTip(), -1000
+}
 ; ========================================
 ; START MACRO (CTRL + M)
 ; ========================================
@@ -21,7 +48,6 @@ global ManaStage := 0
     global DetectInProgress, ManaStage
     ManaStage := 0
     DetectInProgress := false
-    InitRobloxWindows()
     SetTimer Manafarm, 1000
 }
 

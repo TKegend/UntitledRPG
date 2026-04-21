@@ -172,18 +172,19 @@ LoopWindows()
 
         if (Index = 1)
         {
-            Sleep 200
             SendKey("r")
             Sleep 1000
             SendKey("t")
+            Sleep 200
             Break
         }
 
-        Sleep 200
+  
         SendKey("r")
+        Sleep 200
     }
 
-    Sleep 6100
+    Sleep 6000
     Loop RobloxWindows.Length-1
     {
         if !Running
@@ -199,15 +200,16 @@ LoopWindows()
 
         if (Index = 1)
         {
-            Sleep 200
+
             SendKey("r")
+            Sleep 200
             ; Sleep 1000
             ; SendKey("t")
             Break
         }
 
-        Sleep 200
         SendKey("r")
+        Sleep 200
     }
 
     CrabKilled++
@@ -239,15 +241,13 @@ LoopWindows()
 
         if (Index = 1)
         {
-            Sleep 200
             SendEvent "{s down}"
             Sleep 200
             SendEvent "{s up}"
-            TimeElapse += 400
+            TimeElapse += 200
             Break
         }
 
-        Sleep 200
         SendEvent "{d down}"
         Sleep 400
         SendEvent "{d up}"
@@ -255,7 +255,7 @@ LoopWindows()
         SendEvent "{w down}"
         Sleep 300
         SendEvent "{w up}"
-        TimeElapse += 1100
+        TimeElapse += 900
     }
 
     
