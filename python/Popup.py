@@ -21,12 +21,11 @@ DARK_THRESHOLD = 60         # lower = darker
 WINDOW_TITLES = ["Roblox", "Roblox Player"]
 
 TEMPLATE_PATHS = [
-    # os.path.join(_IMAGES, "public.png"),
     os.path.join(_IMAGES, "popup3.png"),
-    os.path.join(_IMAGES, "popup4.png"),
+    os.path.join(_IMAGES, "popup4.png")
 ]
 DETECT_FILE = os.path.join(_ROOT, "detect.txt")
-THRESHOLD = 0.50
+THRESHOLD = 0.85
 SIGNAL_FILE = os.path.join(_ROOT, "reconnect.txt")
 DELETE_FILE = os.path.join(_ROOT, "reconnect.txt")
 CHECK_INTERVAL = 1.0
@@ -37,8 +36,9 @@ CODE_FILE = os.path.join(_ROOT, "code.txt")
 
 # relative region of the number popup (tweak if needed)
 # NUMBER_REGION1 = (0.58, 0.18, 0.64, 0.2125)
-NUMBER_REGION1 = (0.58, 0.18, 0.64, 0.22)
-NUMBER_REGION2 = (0.19, 0.33, 0.81, 0.44)
+NUMBER_REGION_3 = (0.58, 0.18, 0.64, 0.22)
+NUMBER_REGION_4 = (0.58, 0.18, 0.637 , 0.22)
+# NUMBER_REGION2 = (0.19, 0.33, 0.81, 0.44)
 # ==========================================
 
 
@@ -97,8 +97,8 @@ def extract_digits(img, mode = "single"):
 
     digits = "".join(filter(str.isdigit, text))
 
-    if len(digits) == 3:
-        digits = digits[0] + "8" + digits[1:]
+    # if len(digits) == 3:
+    #     digits = digits[0] + "8" + digits[1:]
     return digits
 
 def is_fifth_player_present(frame):
@@ -150,10 +150,11 @@ def handle_detect(templates):
             print(f"Disconnect detected using {name} ({max_val:.2f})")
 
             h, w, _ = frame.shape
-            x1 = int(w * NUMBER_REGION1[0])
-            y1 = int(h * NUMBER_REGION1[1])
-            x2 = int(w * NUMBER_REGION1[2])
-            y2 = int(h * NUMBER_REGION1[3])
+            number_region = NUMBER_REGION_4 if "popup4" in name else NUMBER_REGION_3
+            x1 = int(w * number_region[0])
+            y1 = int(h * number_region[1])
+            x2 = int(w * number_region[2])
+            y2 = int(h * number_region[3])
 
             roi = frame[y1:y2, x1:x2]
             cv2.imwrite(os.path.join(_IMAGES, "debug_roi.png"), roi)
