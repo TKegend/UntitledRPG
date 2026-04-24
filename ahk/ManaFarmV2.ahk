@@ -7,7 +7,7 @@ RECONNECT_FILE := A_ScriptDir "\..\.\reconnect.txt"
 global Code := ""
 global Pos := ""
 global Coord := [171,226,274,321,373,422,473,523,574,624,624]
-global Cycle := [2,2,1,2]
+global Cycle := [1,1,1,1]
 global CoordY := 234
 global idx := 1
 global DetectInProgress := false
@@ -57,7 +57,6 @@ global ManaStage := 0
 ^n::
 {
     global DetectInProgress, ManaStage
-    ManaStage := 0
     DetectInProgress := true
     SetTimer Manafarm, 0
 }
@@ -74,7 +73,6 @@ global ManaStage := 0
 
 ^x::
 {
-    InitRobloxWindows()
     TestCheck()
 }
 
@@ -234,54 +232,42 @@ Manafarm()
         }
         loop Cycle[1]
         {
-            Count := 0
-            TempIdx := idx
             Loop RobloxWindows.Length
             {
                 if DetectInProgress
                     return
                 Count++
-                hwnd := RobloxWindows[TempIdx]
+                hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
-                    RobloxWindows.RemoveAt(TempIdx)
+                    RobloxWindows.RemoveAt(A_Index)
                     continue
                 }
                 Activate(hwnd, 200)
                 SendEvent "t"
                 Sleep 200
-
-                if Count = RobloxWindows.Length
-                    break
-                TempIdx++
-                if TempIdx > RobloxWindows.Length
-                    TempIdx := 1
             }
             Sleep 1000 - (400*(RobloxWindows.Length-1))
-            Count := 0
-            TempIdx := idx
             Loop RobloxWindows.Length
             {
                 if DetectInProgress
                     return
                 Count++
-                hwnd := RobloxWindows[TempIdx]
+                hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
-                    RobloxWindows.RemoveAt(TempIdx)
+                    RobloxWindows.RemoveAt(A_Index)
                     continue
                 }
                 Activate(hwnd, 200)
                 SendEvent "r"
                 Sleep 200
-
-                if Count = RobloxWindows.Length
-                    break
-                TempIdx++
-                if TempIdx > RobloxWindows.Length
-                    TempIdx := 1
             }
-            idx := TempIdx
+            idx++
+            if idx > RobloxWindows.Length
+                idx := 1
+            hwnd := RobloxWindows[idx]
+            Activate(hwnd, 200)
             detectFile := A_ScriptDir "\\..\detect.txt"
             Loop 5
             {
@@ -310,7 +296,7 @@ Manafarm()
                 Sleep 200
                 break
             }
-            Sleep 5300
+            Sleep 5000
         }
         loop RobloxWindows.Length
         {
@@ -329,54 +315,42 @@ Manafarm()
     {
         loop Cycle[2]
         {
-            Count := 0
-            TempIdx := idx
             Loop RobloxWindows.Length
             {
                 if DetectInProgress
                     return
                 Count++
-                hwnd := RobloxWindows[TempIdx]
+                hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
-                    RobloxWindows.RemoveAt(TempIdx)
+                    RobloxWindows.RemoveAt(A_Index)
                     continue
                 }
                 Activate(hwnd, 200)
                 SendEvent "t"
                 Sleep 200
-
-                if Count = RobloxWindows.Length
-                    break
-                TempIdx++
-                if TempIdx > RobloxWindows.Length
-                    TempIdx := 1
             }
             Sleep 1000 - (400*(RobloxWindows.Length-1))
-            Count := 0
-            TempIdx := idx
             Loop RobloxWindows.Length
             {
                 if DetectInProgress
                     return
                 Count++
-                hwnd := RobloxWindows[TempIdx]
+                hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
-                    RobloxWindows.RemoveAt(TempIdx)
+                    RobloxWindows.RemoveAt(A_Index)
                     continue
                 }
                 Activate(hwnd, 200)
                 SendEvent "r"
                 Sleep 200
-
-                if Count = RobloxWindows.Length
-                    break
-                TempIdx++
-                if TempIdx > RobloxWindows.Length
-                    TempIdx := 1
             }
-            idx := TempIdx
+            idx++
+            if idx > RobloxWindows.Length
+                idx := 1
+            hwnd := RobloxWindows[idx]
+            Activate(hwnd, 200)
             detectFile := A_ScriptDir "\\..\detect.txt"
             Loop 5
             {
@@ -406,7 +380,7 @@ Manafarm()
                 break
             }
                 
-            Sleep 5300
+            Sleep 5000
         }
         loop RobloxWindows.Length
         {
@@ -425,27 +399,25 @@ Manafarm()
     {
         loop Cycle[3]
         {
-            Count := 0
             Loop RobloxWindows.Length
             {
                 if DetectInProgress
                     return
-                Count++
-                hwnd := RobloxWindows[idx]
+                hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
-                    RobloxWindows.RemoveAt(idx)
+                    RobloxWindows.RemoveAt(A_Index)
                     continue
                 }
                 Activate(hwnd, 200)
                 SendEvent "r"
                 Sleep 200
-                if Count = RobloxWindows.Length
-                    break
-                idx++
-                if idx > RobloxWindows.Length
-                    idx := 1
             }
+            idx++
+            if idx > RobloxWindows.Length
+                idx := 1
+            hwnd := RobloxWindows[idx]
+            Activate(hwnd, 200)
             detectFile := A_ScriptDir "\\..\detect.txt"
             Loop 5
             {
@@ -488,54 +460,41 @@ Manafarm()
     {
         loop Cycle[4]
         {
-            Count := 0
-            TempIdx := idx
             Loop RobloxWindows.Length
             {
                 if DetectInProgress
                     return
-                Count++
-                hwnd := RobloxWindows[TempIdx]
+                hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
-                    RobloxWindows.RemoveAt(TempIdx)
+                    RobloxWindows.RemoveAt(A_Index)
                     continue
                 }
                 Activate(hwnd, 200)
                 SendEvent "t"
                 Sleep 200
-
-                if Count = RobloxWindows.Length
-                    break
-                TempIdx++
-                if TempIdx > RobloxWindows.Length
-                    TempIdx := 1
             }
             Sleep 1000 - (400*(RobloxWindows.Length-1))
-            Count := 0
-            TempIdx := idx
             Loop RobloxWindows.Length
             {
                 if DetectInProgress
                     return
                 Count++
-                hwnd := RobloxWindows[TempIdx]
+                hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
-                    RobloxWindows.RemoveAt(TempIdx)
+                    RobloxWindows.RemoveAt(A_Index)
                     continue
                 }
                 Activate(hwnd, 200)
                 SendEvent "r"
                 Sleep 200
-
-                if Count = RobloxWindows.Length
-                    break
-                TempIdx++
-                if TempIdx > RobloxWindows.Length
-                    TempIdx := 1
             }
-            idx := TempIdx
+            idx++
+            if idx > RobloxWindows.Length
+                idx := 1
+            hwnd := RobloxWindows[idx]
+            Activate(hwnd, 200)
             detectFile := A_ScriptDir "\\..\detect.txt"
             Loop 5
             {
