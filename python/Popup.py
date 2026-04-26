@@ -104,10 +104,10 @@ def extract_digits(img, mode = "single"):
         next_index = len(existing) + 1
         cv2.imwrite(os.path.join(wrong_dir, f"number{next_index}.png"), img)
 
-        # if digits[0] == "5" or digits[0] == "9":
-        #     digits = "2" + digits
-        # elif digits[0] == "2":
-        #     digits = "7" + digits
+        if digits[0] == "5" or digits[0] == "9":
+            digits = "2" + digits
+        elif digits[0] == "2":
+            digits = "7" + digits
 
     return digits
 
