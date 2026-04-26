@@ -39,6 +39,9 @@ CODE_FILE = os.path.join(_ROOT, "code.txt")
 NUMBER_REGION_3 = (0.58, 0.18, 0.64, 0.22)
 NUMBER_REGION_4 = (0.58, 0.18, 0.637, 0.22)
 # NUMBER_REGION2 = (0.19, 0.33, 0.81, 0.44)
+
+# Region used by the per-digit slice OCR function
+NUMBER_REGION_SLICE = (0.58, 0.18, 0.637, 0.22)
 # ==========================================
 
 
@@ -84,19 +87,10 @@ def load_templates():
 
 def extract_digits(img, mode = "single"):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # scale = 2
-    # gray = cv2.resize(gray, (gray.shape[1] * scale, gray.shape[0] * scale),
-    #                   interpolation=cv2.INTER_CUBIC)
-
-    # Invert (white digits on black → black digits on white) then binarize
-    # gray = cv2.bitwise_not(gray)
-    # _, gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
     cv2.imwrite(os.path.join(_IMAGES, "debug_gray.png"), gray)
 
     if mode == "single":
-        config = "--oem 1 --psm 7 -c tessedit_char_whitelist=0123456789"
+        config = "--oem 1 --psm 8 -c tessedit_char_whitelist=0123456789"
     else:
         config = "--oem 1 --psm 6 -c tessedit_char_whitelist=0123456789"
     text = pytesseract.image_to_string(gray, config=config)
@@ -104,46 +98,18 @@ def extract_digits(img, mode = "single"):
     digits = "".join(filter(str.isdigit, text))
 
     if len(digits) == 3:
-        # Save bugged ROI for inspection
         wrong_dir = os.path.join(_IMAGES, "wrong_numbers")
         os.makedirs(wrong_dir, exist_ok=True)
         existing = [f for f in os.listdir(wrong_dir) if f.startswith("number") and f.endswith(".png")]
         next_index = len(existing) + 1
         cv2.imwrite(os.path.join(wrong_dir, f"number{next_index}.png"), img)
 
-        if digits[1] == "5":
+        if digits[0] == "5" or digits[0] == "9":
             digits = "2" + digits
-        elif digits[1] == "2":
+        elif digits[0] == "2":
             digits = "7" + digits
 
     return digits
-
-def is_fifth_player_present(frame):
-    h, w, _ = frame.shape
-
-    x = int(w * FIFTH_ROW_CHECK[0])
-    y = int(h * FIFTH_ROW_CHECK[1])
-
-    pixel = frame[y, x]
-    gray = int(0.299*pixel[2] + 0.587*pixel[1] + 0.114*pixel[0])
-
-    print(f"Pixel check at ({x},{y}) → gray={gray}")
-
-    # ===== DRAW DEBUG POINT =====
-    debug = frame.copy()
-
-    # red dot (the pixel)
-    cv2.circle(debug, (x, y), 6, (0, 0, 255), -1)
-
-    # optional: draw small box around it
-    cv2.rectangle(debug, (x-10, y-10), (x+10, y+10), (0, 255, 0), 2)
-
-    # save image so you can inspect
-    cv2.imwrite(os.path.join(_IMAGES, "debug_pixel.png"), debug)
-
-    return gray < DARK_THRESHOLD
-
-
 
 def handle_detect(templates):
     hwnd = find_roblox_window()
