@@ -104,7 +104,17 @@ def extract_digits(img, mode = "single"):
     digits = "".join(filter(str.isdigit, text))
 
     if len(digits) == 3:
-        digits = "2" + digits
+        # Save bugged ROI for inspection
+        wrong_dir = os.path.join(_IMAGES, "wrong_numbers")
+        os.makedirs(wrong_dir, exist_ok=True)
+        existing = [f for f in os.listdir(wrong_dir) if f.startswith("number") and f.endswith(".png")]
+        next_index = len(existing) + 1
+        cv2.imwrite(os.path.join(wrong_dir, f"number{next_index}.png"), img)
+
+        if digits[1] == "5":
+            digits = "2" + digits
+        elif digits[1] == "2":
+            digits = "7" + digits
 
     return digits
 
