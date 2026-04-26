@@ -76,10 +76,24 @@ global ManaStage := 0
     TestCheck()
 }
 
-; ^b::
-; {
-;     InitRobloxWindows()
-; }
+^b::
+{
+    detectFile := A_ScriptDir "\\..\detect.txt"
+    Loop 5
+    {
+        try
+        {
+            if FileExist(detectFile)
+                FileDelete detectFile
+            FileAppend "1", detectFile
+            break
+        }
+        catch
+        {
+            Sleep 200
+        }
+    }
+}
 
 ^k::
 {
@@ -236,7 +250,6 @@ Manafarm()
             {
                 if DetectInProgress
                     return
-                Count++
                 hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
@@ -252,7 +265,6 @@ Manafarm()
             {
                 if DetectInProgress
                     return
-                Count++
                 hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
@@ -319,7 +331,6 @@ Manafarm()
             {
                 if DetectInProgress
                     return
-                Count++
                 hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
@@ -335,7 +346,6 @@ Manafarm()
             {
                 if DetectInProgress
                     return
-                Count++
                 hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {
@@ -479,7 +489,6 @@ Manafarm()
             {
                 if DetectInProgress
                     return
-                Count++
                 hwnd := RobloxWindows[A_Index]
                 if !IsWindowAlive(hwnd)
                 {

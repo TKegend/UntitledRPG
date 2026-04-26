@@ -37,7 +37,7 @@ CODE_FILE = os.path.join(_ROOT, "code.txt")
 # relative region of the number popup (tweak if needed)
 # NUMBER_REGION1 = (0.58, 0.18, 0.64, 0.2125)
 NUMBER_REGION_3 = (0.58, 0.18, 0.64, 0.22)
-NUMBER_REGION_4 = (0.58, 0.18, 0.637 , 0.22)
+NUMBER_REGION_4 = (0.58, 0.18, 0.637, 0.22)
 # NUMBER_REGION2 = (0.19, 0.33, 0.81, 0.44)
 # ==========================================
 
@@ -85,7 +85,13 @@ def load_templates():
 def extract_digits(img, mode = "single"):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # gray = cv2.convertScaleAbs(gray, alpha=1.2, beta=10)
+    # scale = 2
+    # gray = cv2.resize(gray, (gray.shape[1] * scale, gray.shape[0] * scale),
+    #                   interpolation=cv2.INTER_CUBIC)
+
+    # Invert (white digits on black → black digits on white) then binarize
+    # gray = cv2.bitwise_not(gray)
+    # _, gray = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     cv2.imwrite(os.path.join(_IMAGES, "debug_gray.png"), gray)
 
@@ -97,8 +103,9 @@ def extract_digits(img, mode = "single"):
 
     digits = "".join(filter(str.isdigit, text))
 
-    # if len(digits) == 3:
-    #     digits = digits[0] + "8" + digits[1:]
+    if len(digits) == 3:
+        digits = "2" + digits
+
     return digits
 
 def is_fifth_player_present(frame):
