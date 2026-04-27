@@ -90,7 +90,7 @@ def extract_digits(img, mode = "single"):
     cv2.imwrite(os.path.join(_IMAGES, "debug_gray.png"), gray)
 
     if mode == "single":
-        config = "--oem 1 --psm 8 -c tessedit_char_whitelist=0123456789"
+        config = "--oem 1 --psm 7 -c tessedit_char_whitelist=0123456789"
     else:
         config = "--oem 1 --psm 6 -c tessedit_char_whitelist=0123456789"
     text = pytesseract.image_to_string(gray, config=config)
