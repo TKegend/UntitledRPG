@@ -85,70 +85,68 @@ def load_templates():
     return templates
 
 
-def extract_digits(img, mode = "single"):
+def extract_digits(img, num_digits=4):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     cv2.imwrite(os.path.join(_IMAGES, "debug_gray.png"), gray)
+    whitelist = "-c tessedit_char_whitelist=0123456789"
 
-    if mode == "single":
-        config = "--oem 1 --psm 7 -c tessedit_char_whitelist=0123456789"
-    else:
-        config = "--oem 1 --psm 6 -c tessedit_char_whitelist=0123456789"
-    text = pytesseract.image_to_string(gray, config=config)
+    best_digits = ""
+    for psm in [8, 10, 7, 6]:
+        config = f"--oem 1 --psm {psm} {whitelist}"
+        digits = "".join(filter(str.isdigit, pytesseract.image_to_string(gray, config=config)))
+        print(f"  [extract_digits] PSM {psm}: '{digits}'")
+        if len(digits) == num_digits:
+            best_digits = digits
+            break
+        if len(digits) > len(best_digits):
+            best_digits = digits
 
-    digits = "".join(filter(str.isdigit, text))
-
-    if len(digits) < 4:
-        print(f"OCR result '{digits}' is incomplete, trying boxed fallback...")
-        wrong_dir = os.path.join(_IMAGES, "wrong_numbers")
-        os.makedirs(wrong_dir, exist_ok=True)
-        cv2.imwrite(os.path.join(wrong_dir, f"number{digits}.png"), img)
-        digits = extract_digits_boxed(img)
-        print(f"Fallback OCR Boxed result: {digits}")
-        # if digits[0] == "5" or digits[0] == "9":
-        #     digits = "2" + digits
-        # elif digits[0] == "2":
-        #     digits = "5" + digits
-
-    return digits
+    print(f"  [extract_digits] best: '{best_digits}'")
+    return best_digits
 
 def extract_digits_boxed(img, num_digits=4, scale=4):
     """
     Two-step approach:
-      1. Use image_to_boxes on the inverted+scaled image to reliably detect
-         which slots are occupied (position only — box char value not trusted).
-      2. Re-OCR each occupied slot's slice on the original (non-inverted) scaled
-         image with PSM 10. Falls back to the box character if the slice fails.
+      1. Use image_to_boxes on the inverted+scaled image to detect slot occupancy.
+         Tries PSM 6, 7, 8 until at least one box is found.
+      2. Re-OCR each slot slice on the inverted image with PSM 10.
+         Falls back to the box character if the slice fails.
     Missing slots return '?' (e.g. '?241', '2?41').
     """
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     h_orig, w_orig = gray.shape
 
-    digit_w = 12
-    stride  = 10
+    digit_w  = 12
+    stride   = 10
     left_pad = (w_orig - (stride * (num_digits - 1) + digit_w)) / 2
 
     scaled   = cv2.resize(gray, (w_orig * scale, h_orig * scale), interpolation=cv2.INTER_CUBIC)
     h, w     = scaled.shape
     inverted = cv2.bitwise_not(scaled)
 
-    # Vertical padding helps Tesseract see a clean text line
-    pad_h    = h
+    pad_h      = h
     padded_inv = cv2.copyMakeBorder(inverted, pad_h, pad_h, 0, 0, cv2.BORDER_CONSTANT, value=255)
 
     expected_centers = [(left_pad + i * stride + digit_w / 2) * scale for i in range(num_digits)]
 
-    # ── Step 1: detect slot occupancy via boxes on inverted image ──────────────
-    boxes_config = '--oem 1 --psm 7 -c tessedit_char_whitelist=0123456789'
+    # ── Step 1: detect slot occupancy, try multiple PSMs ──────────────────────
     detected = []
-    for line in pytesseract.image_to_boxes(padded_inv, config=boxes_config).splitlines():
-        parts = line.split()
-        if len(parts) < 5 or not parts[0].isdigit():
-            continue
-        l, r = int(parts[1]), int(parts[3])
-        detected.append(((l + r) / 2, parts[0]))
+    for psm in [6, 7, 8]:
+        boxes_config = f"--oem 1 --psm {psm} -c tessedit_char_whitelist=0123456789"
+        for line in pytesseract.image_to_boxes(padded_inv, config=boxes_config).splitlines():
+            parts = line.split()
+            if len(parts) < 5 or not parts[0].isdigit():
+                continue
+            l, r = int(parts[1]), int(parts[3])
+            detected.append(((l + r) / 2, parts[0]))
+        if detected:
+            print(f"  [extract_digits_boxed] step1 PSM {psm}: found {len(detected)} boxes")
+            break
+    else:
+        print("  [extract_digits_boxed] step1: no boxes detected in any PSM")
 
     occupied      = set()
-    slot_fallback = {}   # boxes char — used only if slice re-OCR fails
+    slot_fallback = {}
     for x_center, char in sorted(detected, key=lambda t: t[0]):
         best = min(
             (s for s in range(num_digits) if s not in occupied),
@@ -159,28 +157,24 @@ def extract_digits_boxed(img, num_digits=4, scale=4):
             occupied.add(best)
             slot_fallback[best] = char
 
-    # ── Step 2: re-OCR each slot slice on the original (non-inverted) image ───
-    slice_config = '--oem 1 --psm 10 -c tessedit_char_whitelist=0123456789'
+    print(f"  [extract_digits_boxed] slots mapped: {slot_fallback}")
+
+    # ── Step 2: re-OCR each slot slice on the inverted image ──────────────────
+    slice_config = "--oem 1 --psm 10 -c tessedit_char_whitelist=0123456789"
     pad_s = h // 2
-    slots = ['?'] * num_digits
+    slots = ["?"] * num_digits
     for slot, fallback_char in slot_fallback.items():
         x1  = max(0, int((left_pad + slot * stride) * scale))
         x2  = min(w, int((left_pad + slot * stride + digit_w) * scale))
-        slc = scaled[:, x1:x2]                          # white-on-black slice
+        slc = inverted[:, x1:x2]                        # dark-on-white slice
         padded_slc = cv2.copyMakeBorder(slc, pad_s, pad_s, pad_s, pad_s,
                                         cv2.BORDER_CONSTANT, value=255)
         text = pytesseract.image_to_string(padded_slc, config=slice_config)
-        d = ''.join(filter(str.isdigit, text))
-        slots[slot] = d[0] if d else fallback_char      # fallback for e.g. '9'
+        d = "".join(filter(str.isdigit, text))
+        slots[slot] = d[0] if d else fallback_char
+        print(f"  [extract_digits_boxed] slot {slot}: OCR='{d}' fallback='{fallback_char}' -> '{slots[slot]}'")
 
-    result = ''.join(slots)
-
-    if '?' in result:
-        wrong_dir = os.path.join(_IMAGES, "wrong_numbers")
-        os.makedirs(wrong_dir, exist_ok=True)
-        cv2.imwrite(os.path.join(wrong_dir, f"number_{result}.png"), img)
-
-    return result
+    return "".join(slots)
 
 
 def handle_detect(templates):
@@ -213,10 +207,22 @@ def handle_detect(templates):
 
             roi = frame[y1:y2, x1:x2]
             cv2.imwrite(os.path.join(_IMAGES, "debug_roi.png"), roi)
+            print(f"  ROI region: ({x1},{y1})-({x2},{y2})")
 
-            # ----- Signal AHK (UNCHANGED VARIABLE) -----
-            digits = extract_digits(roi, mode="single")
-            # digits = extract_digits_boxed(roi)
+            # ----- OCR: try extract_digits first, boxed as fallback -----
+            digits = extract_digits(roi)
+
+            if len(digits) in (1, 2, 3):
+                print(f"  extract_digits got {len(digits)} digits ('{digits}') -> boxed fallback")
+                wrong_dir = os.path.join(_IMAGES, "wrong_numbers")
+                os.makedirs(wrong_dir, exist_ok=True)
+                debug_path = os.path.join(wrong_dir, f"number{digits}.png")
+                cv2.imwrite(debug_path, roi)
+                print(f"  Saved debug image -> wrong_numbers/number{digits}.png")
+                digits = extract_digits_boxed(roi)
+                print(f"  extract_digits_boxed result: '{digits}'")
+            elif len(digits) != 4:
+                print(f"  extract_digits returned no usable digits: '{digits}'")
 
             if digits.isdigit() and len(digits) == 4:
                 with open(SIGNAL_FILE, "w") as f:
