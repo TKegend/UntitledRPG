@@ -100,14 +100,12 @@ def extract_digits(img, mode = "single"):
     if len(digits) < 4:
         wrong_dir = os.path.join(_IMAGES, "wrong_numbers")
         os.makedirs(wrong_dir, exist_ok=True)
-        existing = [f for f in os.listdir(wrong_dir) if f.startswith("number") and f.endswith(".png")]
-        next_index = len(existing) + 1
-        cv2.imwrite(os.path.join(wrong_dir, f"number{next_index}.png"), img)
+        cv2.imwrite(os.path.join(wrong_dir, f"number{digits}.png"), img)
 
         if digits[0] == "5" or digits[0] == "9":
             digits = "2" + digits
         elif digits[0] == "2":
-            digits = "7" + digits
+            digits = "5" + digits
 
     return digits
 
