@@ -88,18 +88,20 @@ def load_templates():
 def extract_digits(img, num_digits=4):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     cv2.imwrite(os.path.join(_IMAGES, "debug_gray.png"), gray)
+    inverted = cv2.bitwise_not(gray)
     whitelist = "-c tessedit_char_whitelist=0123456789"
 
     best_digits = ""
-    for psm in [8, 10, 7, 6]:
-        config = f"--oem 1 --psm {psm} {whitelist}"
-        digits = "".join(filter(str.isdigit, pytesseract.image_to_string(gray, config=config)))
-        print(f"  [extract_digits] PSM {psm}: '{digits}'")
-        if len(digits) == num_digits:
-            best_digits = digits
-            break
-        if len(digits) > len(best_digits):
-            best_digits = digits
+    for image in [inverted, gray]:
+        for psm in [8, 10, 7, 6]:
+            config = f"--oem 1 --psm {psm} {whitelist}"
+            digits = "".join(filter(str.isdigit, pytesseract.image_to_string(image, config=config)))
+            print(f"  [extract_digits] PSM {psm}: '{digits}'")
+            if len(digits) == num_digits:
+                print(f"  [extract_digits] best: '{digits}'")
+                return digits
+            if len(digits) > len(best_digits):
+                best_digits = digits
 
     print(f"  [extract_digits] best: '{best_digits}'")
     return best_digits
@@ -159,20 +161,30 @@ def extract_digits_boxed(img, num_digits=4, scale=4):
 
     print(f"  [extract_digits_boxed] slots mapped: {slot_fallback}")
 
-    # ── Step 2: re-OCR each slot slice on the inverted image ──────────────────
-    slice_config = "--oem 1 --psm 10 -c tessedit_char_whitelist=0123456789"
+    # ── Step 2: re-OCR each slot, pick highest-confidence digit across PSMs ────
     pad_s = h // 2
     slots = ["?"] * num_digits
     for slot, fallback_char in slot_fallback.items():
         x1  = max(0, int((left_pad + slot * stride) * scale))
         x2  = min(w, int((left_pad + slot * stride + digit_w) * scale))
-        slc = inverted[:, x1:x2]                        # dark-on-white slice
+        slc = scaled[:, x1:x2]                          # white-on-black slice
         padded_slc = cv2.copyMakeBorder(slc, pad_s, pad_s, pad_s, pad_s,
                                         cv2.BORDER_CONSTANT, value=255)
-        text = pytesseract.image_to_string(padded_slc, config=slice_config)
-        d = "".join(filter(str.isdigit, text))
-        slots[slot] = d[0] if d else fallback_char
-        print(f"  [extract_digits_boxed] slot {slot}: OCR='{d}' fallback='{fallback_char}' -> '{slots[slot]}'")
+        best_char = ""
+        best_conf = -1
+        for psm2 in [10, 8, 7, 6]:
+            data = pytesseract.image_to_data(
+                padded_slc,
+                config=f"--oem 1 --psm {psm2} -c tessedit_char_whitelist=0123456789",
+                output_type=pytesseract.Output.DICT
+            )
+            for text, conf in zip(data["text"], data["conf"]):
+                d = "".join(filter(str.isdigit, text))
+                if d and int(conf) > best_conf:
+                    best_conf = int(conf)
+                    best_char = d[0]
+        slots[slot] = best_char if best_char else fallback_char
+        print(f"  [extract_digits_boxed] slot {slot}: best='{best_char}' conf={best_conf} fallback='{fallback_char}' -> '{slots[slot]}'")
 
     return "".join(slots)
 
@@ -212,7 +224,7 @@ def handle_detect(templates):
             # ----- OCR: try extract_digits first, boxed as fallback -----
             digits = extract_digits(roi)
 
-            if len(digits) in (1, 2, 3):
+            if len(digits) != 4:
                 print(f"  extract_digits got {len(digits)} digits ('{digits}') -> boxed fallback")
                 wrong_dir = os.path.join(_IMAGES, "wrong_numbers")
                 os.makedirs(wrong_dir, exist_ok=True)
@@ -221,8 +233,6 @@ def handle_detect(templates):
                 print(f"  Saved debug image -> wrong_numbers/number{digits}.png")
                 digits = extract_digits_boxed(roi)
                 print(f"  extract_digits_boxed result: '{digits}'")
-            elif len(digits) != 4:
-                print(f"  extract_digits returned no usable digits: '{digits}'")
 
             if digits.isdigit() and len(digits) == 4:
                 with open(SIGNAL_FILE, "w") as f:
