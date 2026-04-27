@@ -1,5 +1,5 @@
 venv/
 images/debug_*.png
 *.lnk
-# images/wrong_numbers/*.png
+images/wrong_numbers/*.png
 python/*.ipynb

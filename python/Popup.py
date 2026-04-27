@@ -98,14 +98,16 @@ def extract_digits(img, mode = "single"):
     digits = "".join(filter(str.isdigit, text))
 
     if len(digits) < 4:
+        print(f"OCR result '{digits}' is incomplete, trying boxed fallback...")
         wrong_dir = os.path.join(_IMAGES, "wrong_numbers")
         os.makedirs(wrong_dir, exist_ok=True)
         cv2.imwrite(os.path.join(wrong_dir, f"number{digits}.png"), img)
-
-        if digits[0] == "5" or digits[0] == "9":
-            digits = "2" + digits
-        elif digits[0] == "2":
-            digits = "5" + digits
+        digits = extract_digits_boxed(img)
+        print(f"Fallback OCR Boxed result: {digits}")
+        # if digits[0] == "5" or digits[0] == "9":
+        #     digits = "2" + digits
+        # elif digits[0] == "2":
+        #     digits = "5" + digits
 
     return digits
 
@@ -213,8 +215,8 @@ def handle_detect(templates):
             cv2.imwrite(os.path.join(_IMAGES, "debug_roi.png"), roi)
 
             # ----- Signal AHK (UNCHANGED VARIABLE) -----
-            # digits = extract_digits(roi, mode="single")
-            digits = extract_digits_boxed(roi)
+            digits = extract_digits(roi, mode="single")
+            # digits = extract_digits_boxed(roi)
 
             if digits.isdigit() and len(digits) == 4:
                 with open(SIGNAL_FILE, "w") as f:

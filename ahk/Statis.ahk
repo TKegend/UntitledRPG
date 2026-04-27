@@ -34,7 +34,6 @@ global DetectInProgress := false
 DoThis()
 {
     Send "e"
-    Send "r"
 }
 ; ========================================
 ; STOP MACRO (CTRL + N)
