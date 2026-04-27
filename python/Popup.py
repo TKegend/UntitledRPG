@@ -171,7 +171,14 @@ def extract_digits_boxed(img, num_digits=4, scale=4):
         d = ''.join(filter(str.isdigit, text))
         slots[slot] = d[0] if d else fallback_char      # fallback for e.g. '9'
 
-    return ''.join(slots)
+    result = ''.join(slots)
+
+    if '?' in result:
+        wrong_dir = os.path.join(_IMAGES, "wrong_numbers")
+        os.makedirs(wrong_dir, exist_ok=True)
+        cv2.imwrite(os.path.join(wrong_dir, f"number_{result}.png"), img)
+
+    return result
 
 
 def handle_detect(templates):
