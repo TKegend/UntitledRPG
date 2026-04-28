@@ -183,6 +183,8 @@ def extract_digits_boxed(img, num_digits=4, scale=4):
                 if d and int(conf) > best_conf:
                     best_conf = int(conf)
                     best_char = d[0]
+            if best_conf >= 60:   # good enough — skip remaining PSMs
+                break
         slots[slot] = best_char if best_char else fallback_char
         print(f"  [extract_digits_boxed] slot {slot}: best='{best_char}' conf={best_conf} fallback='{fallback_char}' -> '{slots[slot]}'")
 
@@ -209,6 +211,9 @@ def handle_detect(templates):
 
         if max_val >= THRESHOLD:
             print(f"Disconnect detected using {name} ({max_val:.2f})")
+            with open(SIGNAL_FILE, "w") as f:
+                f.write("")
+            print("  Signal file created (empty) — OCR starting")
 
             h, w, _ = frame.shape
             number_region = NUMBER_REGION_4 if "popup4" in name else NUMBER_REGION_3

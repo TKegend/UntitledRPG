@@ -130,17 +130,27 @@ TestCheck()
     }
 }
 
-CheckReconnectFile()
+CheckReconnectFile(initialWait := 1000, timeoutMs := 2000)
 {
-    global RECONNECT_FILE
+    global RECONNECT_FILE, Code
 
-    if FileExist(RECONNECT_FILE)
+    Sleep initialWait
+
+    if !FileExist(RECONNECT_FILE)
+        return   ; no popup — move on immediately
+
+    ; Empty file exists: popup confirmed, poll for digits
+    startTime := A_TickCount
+    while (A_TickCount - startTime < timeoutMs)
     {
-        global Code
-        Code := Trim(FileRead(RECONNECT_FILE))
-        Sleep 500
-        FileDelete RECONNECT_FILE
-
+        content := Trim(FileRead(RECONNECT_FILE))
+        if (content != "")
+        {
+            Code := content
+            try FileDelete RECONNECT_FILE
+            return
+        }
+        Sleep 200
     }
 }
 
@@ -242,7 +252,6 @@ Manafarm()
                     Sleep 200
                 }
             }
-            Sleep 3000            
             CheckReconnectFile()
             if Code
             {
@@ -305,7 +314,6 @@ Manafarm()
                     Sleep 200
                 }
             }
-            Sleep 3000            
             CheckReconnectFile()
             if Code
             {
@@ -368,7 +376,6 @@ Manafarm()
                     Sleep 200
                 }
             }
-            Sleep 3000            
             CheckReconnectFile()
             if Code
             {
