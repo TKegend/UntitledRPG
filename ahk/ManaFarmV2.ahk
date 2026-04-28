@@ -173,7 +173,7 @@ TestCheck()
     }
 }
 
-CheckReconnectFile(initialWait := 1000, timeoutMs := 2000)
+CheckReconnectFile(initialWait := 1000, timeoutMs := 4000)
 {
     global RECONNECT_FILE, Code
 
