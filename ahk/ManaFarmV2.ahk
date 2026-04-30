@@ -506,33 +506,36 @@ Manafarm()
                 SendEvent "r"
                 Sleep 200
             }
-            idx++
-            if idx > RobloxWindows.Length
-                idx := 1
-            hwnd := RobloxWindows[idx]
-            Activate(hwnd, 200)
-            detectFile := A_ScriptDir "\\..\detect.txt"
-            Loop 5
-            {
-                try
+            loop 2 {
+                idx++
+                if idx > RobloxWindows.Length
+                    idx := 1
+                hwnd := RobloxWindows[idx]
+                Activate(hwnd, 200)
+                detectFile := A_ScriptDir "\\..\detect.txt"
+                Loop 5
                 {
-                    if FileExist(detectFile)
-                        FileDelete detectFile
-                    FileAppend "1", detectFile
-                    break
+                    try
+                    {
+                        if FileExist(detectFile)
+                            FileDelete detectFile
+                        FileAppend "1", detectFile
+                        break
+                    }
+                    catch
+                    {
+                        Sleep 200
+                    }
                 }
-                catch
+                CheckReconnectFile()
+                if Code
                 {
-                    Sleep 200
-                }
+                    Reconnect()
+                    Code := ""
+                    return
+                }   
+                Sleep 200
             }
-            CheckReconnectFile()
-            if Code
-            {
-                Reconnect()
-                Code := ""
-                return
-            }   
             Sleep 4000
         }
         ManaStage := 0
